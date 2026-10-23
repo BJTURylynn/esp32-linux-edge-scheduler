@@ -1,0 +1,683 @@
+{
+  "schema_version": 1,
+  "data_source": "synthetic",
+  "p95_method": "nearest_rank",
+  "comparable_configuration": true,
+  "runs": [
+    {
+      "run": "run-01-fifo",
+      "policy": "fifo",
+      "metrics": {
+        "normal": {
+          "completed": 24,
+          "rejected": 0,
+          "wait_ms": {
+            "mean": 533.4299025,
+            "p95": 976.037882,
+            "max": 1016.017148
+          },
+          "compute_ms": {
+            "mean": 46.623885916666666,
+            "p95": 56.039401,
+            "max": 94.045643
+          },
+          "total_ms": {
+            "mean": 581.6790914583333,
+            "p95": 1017.101361,
+            "max": 1056.004245
+          }
+        },
+        "urgent": {
+          "completed": 8,
+          "rejected": 0,
+          "wait_ms": {
+            "mean": 1053.6220065,
+            "p95": 1054.974371,
+            "max": 1054.974371
+          },
+          "compute_ms": {
+            "mean": 0.265718625,
+            "p95": 0.301528,
+            "max": 0.301528
+          },
+          "total_ms": {
+            "mean": 1053.948716625,
+            "p95": 1055.27739,
+            "max": 1055.27739
+          }
+        }
+      },
+      "metadata": {
+        "policy": "fifo",
+        "repeat": 1,
+        "workload_sha256": "c544f627861eb1f7ec154c17a6672c3a86550771202b6abc0e6a5d469097a155",
+        "conditions": {
+          "capacity": 64,
+          "window": 8,
+          "passes": 2000,
+          "worker_threads": 1,
+          "platform": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39",
+          "affinity": [
+            0
+          ],
+          "server_sha256": "21a88335ee9786e12069f595907f0cb9233f78b3cc06712f89043d4e132d46cc"
+        },
+        "replay": {
+          "sent": 32,
+          "max_send_lateness_ms": 6.863817000053133,
+          "mean_send_lateness_ms": 2.067692625007737
+        },
+        "final_status": {
+          "policy": "fifo",
+          "queue_depth": 0,
+          "queue_capacity": 64,
+          "accepted": 32,
+          "completed": 32,
+          "rejected": 0,
+          "running": true,
+          "active": false,
+          "window": 8,
+          "passes": 2000,
+          "accepting": true,
+          "fatal": false
+        },
+        "command": [
+          "/home/edge/project/linux/build/edge_scheduler",
+          "--bind",
+          "127.0.0.1",
+          "--port",
+          "44115",
+          "--policy",
+          "fifo",
+          "--capacity",
+          "64",
+          "--window",
+          "8",
+          "--passes",
+          "2000",
+          "--output",
+          "results/comparison/run-01-fifo"
+        ],
+        "data_source": "synthetic"
+      },
+      "unclassified_rejections": 0
+    },
+    {
+      "run": "run-01-priority",
+      "policy": "priority",
+      "metrics": {
+        "normal": {
+          "completed": 24,
+          "rejected": 0,
+          "wait_ms": {
+            "mean": 533.048423125,
+            "p95": 979.847008,
+            "max": 1027.488171
+          },
+          "compute_ms": {
+            "mean": 46.10400170833333,
+            "p95": 53.851465,
+            "max": 71.552671
+          },
+          "total_ms": {
+            "mean": 580.82541125,
+            "p95": 1028.683943,
+            "max": 1078.378628
+          }
+        },
+        "urgent": {
+          "completed": 8,
+          "rejected": 0,
+          "wait_ms": {
+            "mean": 55.3034065,
+            "p95": 59.621154,
+            "max": 59.621154
+          },
+          "compute_ms": {
+            "mean": 0.317248,
+            "p95": 0.434408,
+            "max": 0.434408
+          },
+          "total_ms": {
+            "mean": 55.661411375,
+            "p95": 59.934538,
+            "max": 59.934538
+          }
+        }
+      },
+      "metadata": {
+        "policy": "priority",
+        "repeat": 1,
+        "workload_sha256": "c544f627861eb1f7ec154c17a6672c3a86550771202b6abc0e6a5d469097a155",
+        "conditions": {
+          "capacity": 64,
+          "window": 8,
+          "passes": 2000,
+          "worker_threads": 1,
+          "platform": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39",
+          "affinity": [
+            0
+          ],
+          "server_sha256": "21a88335ee9786e12069f595907f0cb9233f78b3cc06712f89043d4e132d46cc"
+        },
+        "replay": {
+          "sent": 32,
+          "max_send_lateness_ms": 9.631033999938154,
+          "mean_send_lateness_ms": 2.569067874957824
+        },
+        "final_status": {
+          "policy": "priority",
+          "queue_depth": 0,
+          "queue_capacity": 64,
+          "accepted": 32,
+          "completed": 32,
+          "rejected": 0,
+          "running": true,
+          "active": false,
+          "window": 8,
+          "passes": 2000,
+          "accepting": true,
+          "fatal": false
+        },
+        "command": [
+          "/home/edge/project/linux/build/edge_scheduler",
+          "--bind",
+          "127.0.0.1",
+          "--port",
+          "46539",
+          "--policy",
+          "priority",
+          "--capacity",
+          "64",
+          "--window",
+          "8",
+          "--passes",
+          "2000",
+          "--output",
+          "results/comparison/run-01-priority"
+        ],
+        "data_source": "synthetic"
+      },
+      "unclassified_rejections": 0
+    },
+    {
+      "run": "run-02-fifo",
+      "policy": "fifo",
+      "metrics": {
+        "normal": {
+          "completed": 24,
+          "rejected": 0,
+          "wait_ms": {
+            "mean": 537.4415190833333,
+            "p95": 955.596346,
+            "max": 996.889244
+          },
+          "compute_ms": {
+            "mean": 46.39991041666667,
+            "p95": 55.306423,
+            "max": 100.478047
+          },
+          "total_ms": {
+            "mean": 585.2351379583333,
+            "p95": 998.325308,
+            "max": 1042.427871
+          }
+        },
+        "urgent": {
+          "completed": 8,
+          "rejected": 0,
+          "wait_ms": {
+            "mean": 1044.095497375,
+            "p95": 1046.363103,
+            "max": 1046.363103
+          },
+          "compute_ms": {
+            "mean": 0.303088625,
+            "p95": 0.3762,
+            "max": 0.3762
+          },
+          "total_ms": {
+            "mean": 1044.44059375,
+            "p95": 1046.705144,
+            "max": 1046.705144
+          }
+        }
+      },
+      "metadata": {
+        "policy": "fifo",
+        "repeat": 2,
+        "workload_sha256": "c544f627861eb1f7ec154c17a6672c3a86550771202b6abc0e6a5d469097a155",
+        "conditions": {
+          "capacity": 64,
+          "window": 8,
+          "passes": 2000,
+          "worker_threads": 1,
+          "platform": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39",
+          "affinity": [
+            0
+          ],
+          "server_sha256": "21a88335ee9786e12069f595907f0cb9233f78b3cc06712f89043d4e132d46cc"
+        },
+        "replay": {
+          "sent": 32,
+          "max_send_lateness_ms": 9.309676000015315,
+          "mean_send_lateness_ms": 3.1883985937634236
+        },
+        "final_status": {
+          "policy": "fifo",
+          "queue_depth": 0,
+          "queue_capacity": 64,
+          "accepted": 32,
+          "completed": 32,
+          "rejected": 0,
+          "running": true,
+          "active": false,
+          "window": 8,
+          "passes": 2000,
+          "accepting": true,
+          "fatal": false
+        },
+        "command": [
+          "/home/edge/project/linux/build/edge_scheduler",
+          "--bind",
+          "127.0.0.1",
+          "--port",
+          "51435",
+          "--policy",
+          "fifo",
+          "--capacity",
+          "64",
+          "--window",
+          "8",
+          "--passes",
+          "2000",
+          "--output",
+          "results/comparison/run-02-fifo"
+        ],
+        "data_source": "synthetic"
+      },
+      "unclassified_rejections": 0
+    },
+    {
+      "run": "run-02-priority",
+      "policy": "priority",
+      "metrics": {
+        "normal": {
+          "completed": 24,
+          "rejected": 0,
+          "wait_ms": {
+            "mean": 595.1276187916667,
+            "p95": 1072.626485,
+            "max": 1119.532822
+          },
+          "compute_ms": {
+            "mean": 50.34357679166666,
+            "p95": 61.205989,
+            "max": 88.142716
+          },
+          "total_ms": {
+            "mean": 646.5739064166667,
+            "p95": 1123.375263,
+            "max": 1174.302252
+          }
+        },
+        "urgent": {
+          "completed": 8,
+          "rejected": 0,
+          "wait_ms": {
+            "mean": 10.495111625,
+            "p95": 12.079344,
+            "max": 12.079344
+          },
+          "compute_ms": {
+            "mean": 0.34941875,
+            "p95": 0.720816,
+            "max": 0.720816
+          },
+          "total_ms": {
+            "mean": 10.888751875,
+            "p95": 12.378652,
+            "max": 12.378652
+          }
+        }
+      },
+      "metadata": {
+        "policy": "priority",
+        "repeat": 2,
+        "workload_sha256": "c544f627861eb1f7ec154c17a6672c3a86550771202b6abc0e6a5d469097a155",
+        "conditions": {
+          "capacity": 64,
+          "window": 8,
+          "passes": 2000,
+          "worker_threads": 1,
+          "platform": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39",
+          "affinity": [
+            0
+          ],
+          "server_sha256": "21a88335ee9786e12069f595907f0cb9233f78b3cc06712f89043d4e132d46cc"
+        },
+        "replay": {
+          "sent": 32,
+          "max_send_lateness_ms": 7.404961999938678,
+          "mean_send_lateness_ms": 1.766045562497169
+        },
+        "final_status": {
+          "policy": "priority",
+          "queue_depth": 0,
+          "queue_capacity": 64,
+          "accepted": 32,
+          "completed": 32,
+          "rejected": 0,
+          "running": true,
+          "active": false,
+          "window": 8,
+          "passes": 2000,
+          "accepting": true,
+          "fatal": false
+        },
+        "command": [
+          "/home/edge/project/linux/build/edge_scheduler",
+          "--bind",
+          "127.0.0.1",
+          "--port",
+          "55937",
+          "--policy",
+          "priority",
+          "--capacity",
+          "64",
+          "--window",
+          "8",
+          "--passes",
+          "2000",
+          "--output",
+          "results/comparison/run-02-priority"
+        ],
+        "data_source": "synthetic"
+      },
+      "unclassified_rejections": 0
+    },
+    {
+      "run": "run-03-fifo",
+      "policy": "fifo",
+      "metrics": {
+        "normal": {
+          "completed": 24,
+          "rejected": 0,
+          "wait_ms": {
+            "mean": 500.3703066666667,
+            "p95": 933.384866,
+            "max": 969.85233
+          },
+          "compute_ms": {
+            "mean": 44.211404458333334,
+            "p95": 51.521094,
+            "max": 78.734234
+          },
+          "total_ms": {
+            "mean": 546.05682175,
+            "p95": 975.78685,
+            "max": 1015.291053
+          }
+        },
+        "urgent": {
+          "completed": 8,
+          "rejected": 0,
+          "wait_ms": {
+            "mean": 1016.947139875,
+            "p95": 1019.330158,
+            "max": 1019.330158
+          },
+          "compute_ms": {
+            "mean": 0.291459,
+            "p95": 0.425453,
+            "max": 0.425453
+          },
+          "total_ms": {
+            "mean": 1017.275027,
+            "p95": 1019.785329,
+            "max": 1019.785329
+          }
+        }
+      },
+      "metadata": {
+        "policy": "fifo",
+        "repeat": 3,
+        "workload_sha256": "c544f627861eb1f7ec154c17a6672c3a86550771202b6abc0e6a5d469097a155",
+        "conditions": {
+          "capacity": 64,
+          "window": 8,
+          "passes": 2000,
+          "worker_threads": 1,
+          "platform": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39",
+          "affinity": [
+            0
+          ],
+          "server_sha256": "21a88335ee9786e12069f595907f0cb9233f78b3cc06712f89043d4e132d46cc"
+        },
+        "replay": {
+          "sent": 32,
+          "max_send_lateness_ms": 9.070551999969211,
+          "mean_send_lateness_ms": 2.2704873437072877
+        },
+        "final_status": {
+          "policy": "fifo",
+          "queue_depth": 0,
+          "queue_capacity": 64,
+          "accepted": 32,
+          "completed": 32,
+          "rejected": 0,
+          "running": true,
+          "active": false,
+          "window": 8,
+          "passes": 2000,
+          "accepting": true,
+          "fatal": false
+        },
+        "command": [
+          "/home/edge/project/linux/build/edge_scheduler",
+          "--bind",
+          "127.0.0.1",
+          "--port",
+          "42201",
+          "--policy",
+          "fifo",
+          "--capacity",
+          "64",
+          "--window",
+          "8",
+          "--passes",
+          "2000",
+          "--output",
+          "results/comparison/run-03-fifo"
+        ],
+        "data_source": "synthetic"
+      },
+      "unclassified_rejections": 0
+    },
+    {
+      "run": "run-03-priority",
+      "policy": "priority",
+      "metrics": {
+        "normal": {
+          "completed": 24,
+          "rejected": 0,
+          "wait_ms": {
+            "mean": 492.33140499999996,
+            "p95": 887.841887,
+            "max": 937.407809
+          },
+          "compute_ms": {
+            "mean": 43.41380445833334,
+            "p95": 46.907447,
+            "max": 96.855046
+          },
+          "total_ms": {
+            "mean": 537.4303989583333,
+            "p95": 934.668663,
+            "max": 985.060765
+          }
+        },
+        "urgent": {
+          "completed": 8,
+          "rejected": 0,
+          "wait_ms": {
+            "mean": 6.931701625,
+            "p95": 9.724759,
+            "max": 9.724759
+          },
+          "compute_ms": {
+            "mean": 0.3096605,
+            "p95": 0.408646,
+            "max": 0.408646
+          },
+          "total_ms": {
+            "mean": 7.274347625,
+            "p95": 10.057275,
+            "max": 10.057275
+          }
+        }
+      },
+      "metadata": {
+        "policy": "priority",
+        "repeat": 3,
+        "workload_sha256": "c544f627861eb1f7ec154c17a6672c3a86550771202b6abc0e6a5d469097a155",
+        "conditions": {
+          "capacity": 64,
+          "window": 8,
+          "passes": 2000,
+          "worker_threads": 1,
+          "platform": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39",
+          "affinity": [
+            0
+          ],
+          "server_sha256": "21a88335ee9786e12069f595907f0cb9233f78b3cc06712f89043d4e132d46cc"
+        },
+        "replay": {
+          "sent": 32,
+          "max_send_lateness_ms": 5.984232000027078,
+          "mean_send_lateness_ms": 1.7502814375122284
+        },
+        "final_status": {
+          "policy": "priority",
+          "queue_depth": 0,
+          "queue_capacity": 64,
+          "accepted": 32,
+          "completed": 32,
+          "rejected": 0,
+          "running": true,
+          "active": false,
+          "window": 8,
+          "passes": 2000,
+          "accepting": true,
+          "fatal": false
+        },
+        "command": [
+          "/home/edge/project/linux/build/edge_scheduler",
+          "--bind",
+          "127.0.0.1",
+          "--port",
+          "35215",
+          "--policy",
+          "priority",
+          "--capacity",
+          "64",
+          "--window",
+          "8",
+          "--passes",
+          "2000",
+          "--output",
+          "results/comparison/run-03-priority"
+        ],
+        "data_source": "synthetic"
+      },
+      "unclassified_rejections": 0
+    }
+  ],
+  "pooled": {
+    "fifo": {
+      "normal": {
+        "completed": 72,
+        "rejected": 0,
+        "wait_ms": {
+          "mean": 523.74724275,
+          "p95": 969.85233,
+          "max": 1016.017148
+        },
+        "compute_ms": {
+          "mean": 45.74506693055556,
+          "p95": 56.039401,
+          "max": 100.478047
+        },
+        "total_ms": {
+          "mean": 570.9903503888888,
+          "p95": 1015.291053,
+          "max": 1056.004245
+        }
+      },
+      "urgent": {
+        "completed": 24,
+        "rejected": 0,
+        "wait_ms": {
+          "mean": 1038.2215479166666,
+          "p95": 1054.767676,
+          "max": 1054.974371
+        },
+        "compute_ms": {
+          "mean": 0.28675541666666665,
+          "p95": 0.3762,
+          "max": 0.425453
+        },
+        "total_ms": {
+          "mean": 1038.554779125,
+          "p95": 1055.125062,
+          "max": 1055.27739
+        }
+      }
+    },
+    "priority": {
+      "normal": {
+        "completed": 72,
+        "rejected": 0,
+        "wait_ms": {
+          "mean": 540.1691489722222,
+          "p95": 1026.914111,
+          "max": 1119.532822
+        },
+        "compute_ms": {
+          "mean": 46.62046098611111,
+          "p95": 61.205989,
+          "max": 96.855046
+        },
+        "total_ms": {
+          "mean": 588.2765722083334,
+          "p95": 1071.233454,
+          "max": 1174.302252
+        }
+      },
+      "urgent": {
+        "completed": 24,
+        "rejected": 0,
+        "wait_ms": {
+          "mean": 24.243406583333336,
+          "p95": 57.733498,
+          "max": 59.621154
+        },
+        "compute_ms": {
+          "mean": 0.3254424166666667,
+          "p95": 0.434408,
+          "max": 0.720816
+        },
+        "total_ms": {
+          "mean": 24.608170291666667,
+          "p95": 58.081939,
+          "max": 59.934538
+        }
+      }
+    }
+  },
+  "limitations": [
+    "P95 is pooled over completed tasks; rejected tasks have no completion latency.",
+    "Identical schedules do not guarantee identical actual arrivals; inspect send lateness and received_ns.",
+    "VM and host scheduling introduce noise; these are local measurements, not hardware or real-time guarantees."
+  ]
+}

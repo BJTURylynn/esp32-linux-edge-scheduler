@@ -1,0 +1,4 @@
+# Local credentials are kept in sdkconfig, which is ignored.
+CONFIG_IDF_TARGET="esp32"
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=6144
+CONFIG_LOG_DEFAULT_LEVEL_INFO=y

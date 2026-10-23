@@ -1,0 +1,5 @@
+* text=auto eol=lf
+*.png binary
+*.pdf binary
+# Keep measured evidence byte-for-byte, including generator whitespace.
+docs/evidence/** -text -whitespace

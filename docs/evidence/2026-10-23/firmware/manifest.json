@@ -1,0 +1,74 @@
+{
+  "built_at": "2026-10-23T00:54:17.354722+08:00",
+  "result": "success",
+  "target": "esp32",
+  "idf_version": "v5.5.6",
+  "idf_commit": "880a203ae603d08a94d06aa01e0d6761958e5e9e",
+  "sdk_kind": "official Git archive snapshot plus required submodules at verified commits, no .git; not full recursive checkout",
+  "compiler": "xtensa-esp-elf GCC 14.2.0 esp-14.2.0_20260121",
+  "guest_project": "/home/edge/project/firmware",
+  "guest_sdk": "/home/edge/.local/esp/esp-idf",
+  "guest_tools": "/home/edge/.local/esp/tools",
+  "command": "IDF_PY_BUILD_JOBS=1 idf.py set-target esp32 && IDF_PY_BUILD_JOBS=1 idf.py build",
+  "wifi_ssid": "",
+  "wifi_password": "",
+  "flashed": false,
+  "hardware_tested": false,
+  "app_main_network_calls": [
+    "ensure_wifi_connected at 0x400d9141",
+    "connect_server at 0x400d9161",
+    "edge_frame_build at 0x400d91d9",
+    "send_all at 0x400d91ff"
+  ],
+  "firmware_sources_sha256": {
+    "CMakeLists.txt": "6067078e0be34989c3bc356b307b5eb5c6f9b175e0f30f70015515f8186e1882",
+    "sdkconfig.defaults": "308431de81ffb76b1e421ea3e87a355fce57bb3c06dcb56b7a1d7f7e4e16869c",
+    "main/CMakeLists.txt": "d854f3b7aeb4e98671b0a98df62f6e1467e52c88df48bc85e0b15c04cb8e4fef",
+    "main/Kconfig.projbuild": "7bf0057e950f5455e82452b45793c4e77c67647be34e48c53b5e8e331ff0d316",
+    "main/main.c": "5b2f8a60cbdfef48d1fd8877e09bedeb8adebb4f5dbfc5e0400a7e5bb0843c47",
+    "main/frame.c": "e306b262a1e1f477c16386fc4bbe0c5f0dd129c677fb9e07f7e2457c3bdd185c",
+    "main/frame.h": "4bcd329e6c7f2c19b5a9b51efc638704f6ec7fc5682ad69e1ae7cc9d8fe03f8b"
+  },
+  "artifacts": {
+    "app_main-disassembly.txt": {
+      "bytes": 13061,
+      "sha256": "3d4765ac6d198bff2799dd1ce658bb49846e186cfa7cd2f6a38c357619a12615"
+    },
+    "bootloader/bootloader.bin": {
+      "bytes": 26000,
+      "sha256": "308fdea2540019959d876573e13d8e739c79e4532ae4ab8a280ab77b6646b7e7"
+    },
+    "build-default.log": {
+      "bytes": 99707,
+      "sha256": "171e70499a74189ecc66684cfa535631838dbd43ce5f32038c450ef66cf5513e"
+    },
+    "edge_scheduler_device.bin": {
+      "bytes": 767568,
+      "sha256": "42119d9db83c71ebc4526db5b6797b39c4053e6ac623be7454de4c3a951c61eb"
+    },
+    "edge_scheduler_device.elf": {
+      "bytes": 7811236,
+      "sha256": "4aef702e41ddf19f51333176addd8d9b45dd447a91775a35a26dd4e1d2dbfffc"
+    },
+    "flash_args": {
+      "bytes": 161,
+      "sha256": "97d28fede1cfb662a87b182cceb589d86305bffd316489da0f4ff4a16e79a4ed"
+    },
+    "flasher_args.json": {
+      "bytes": 937,
+      "sha256": "32bff521890e6028ad55270388118b761ad432502d9f5d8eaebc5b0036f6970a"
+    },
+    "partition_table/partition-table.bin": {
+      "bytes": 3072,
+      "sha256": "7f00b6c042a89b15b0cac534f82ed988caf29278ff5700b0c511eb1b5bb7c820"
+    },
+    "project_description.json": {
+      "bytes": 131133,
+      "sha256": "fa9cabf39ddb912ec6ecd8d3b5cc8152882dd007af53d6d662c97f9e68dd035f"
+    },
+    "sdkconfig": {
+      "bytes": 54333,
+      "sha256": "673702d0e8df9a06c4bfedfbb4259acbc955d2504c8389408c8d863f600f0b02"
+    }
+  }
+}

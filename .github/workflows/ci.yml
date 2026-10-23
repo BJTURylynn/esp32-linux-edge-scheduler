@@ -1,0 +1,25 @@
+name: build-and-test
+on: [push, pull_request]
+jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: make -C linux test all
+      - name: Build and test portable firmware encoder
+        run: |
+          cmake -S firmware/tests -B build/firmware-host
+          cmake --build build/firmware-host
+          ctest --test-dir build/firmware-host --output-on-failure
+      - run: EDGE_SERVER="$PWD/linux/build/edge_scheduler" EDGE_FRAME_TEST="$PWD/build/firmware-host/test_frame" python3 -m unittest discover -s tests -v
+      - run: make -C linux sanitize
+      - name: Exercise network and shutdown under sanitizers
+        run: EDGE_SERVER="$PWD/linux/build-sanitize/edge_scheduler" EDGE_FRAME_TEST="$PWD/build/firmware-host/test_frame" python3 -m unittest discover -s tests -v
+  firmware:
+    runs-on: ubuntu-24.04
+    container: espressif/idf:v5.5.6
+    steps:
+      - uses: actions/checkout@v4
+      - run: . /opt/esp/idf/export.sh && idf.py set-target esp32 && idf.py build
+        shell: bash
+        working-directory: firmware

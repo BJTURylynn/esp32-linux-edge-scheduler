@@ -1,0 +1,68 @@
+menu "Edge scheduler device"
+    config EDGE_WIFI_SSID
+        string "Wi-Fi SSID (2.4 GHz)"
+        default ""
+        help
+            Required, 1..32 bytes. Configure using menuconfig.
+
+    config EDGE_WIFI_PASSWORD
+        string "Wi-Fi password"
+        default ""
+        help
+            Required WPA2/WPA3 passphrase, 8..63 bytes (or 64 hex digits).
+            Stored in the local sdkconfig and the firmware binary.
+
+    config EDGE_SERVER_IPV4
+        string "Linux server IPv4 address"
+        default "192.168.1.100"
+        help
+            Address reachable from the ESP32, normally the bridged VM LAN IP.
+            DNS names are not accepted in this first version.
+
+    config EDGE_SERVER_PORT
+        int "Linux server TCP port"
+        range 1 65535
+        default 9000
+
+    config EDGE_DEVICE_ID
+        string "Device ID (ASCII alphanumeric, hyphen, underscore)"
+        default "esp32-01"
+        help
+            1..32 ASCII characters. Use a unique ID per physical device.
+
+    config EDGE_NORMAL_SAMPLES
+        int "Samples per normal batch"
+        range 1 8192
+        default 2048
+
+    config EDGE_URGENT_SAMPLES
+        int "Samples per urgent batch"
+        range 1 8192
+        default 64
+        help
+            Should be less than normal samples for the small urgent task demo.
+
+    config EDGE_URGENT_EVERY
+        int "Every Nth frame is urgent (0 disables urgent frames)"
+        range 0 1000000
+        default 5
+        help
+            1 makes every frame urgent. Default sends 4 normal then 1 urgent.
+
+    config EDGE_SEND_INTERVAL_MS
+        int "Minimum delay after a successful send (milliseconds)"
+        range 10 60000
+        default 250
+        help
+            Not a fixed sample-rate guarantee; serialization and TCP add time.
+
+    config EDGE_SOCKET_TIMEOUT_MS
+        int "Deadline for one connect or complete frame send (milliseconds)"
+        range 100 60000
+        default 10000
+
+    config EDGE_WIFI_TIMEOUT_MS
+        int "Wi-Fi association and DHCP timeout (milliseconds)"
+        range 1000 60000
+        default 15000
+endmenu

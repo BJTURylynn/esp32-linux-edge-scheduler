@@ -1,0 +1,53 @@
+{
+  "policy": "fifo",
+  "repeat": 2,
+  "workload_sha256": "c544f627861eb1f7ec154c17a6672c3a86550771202b6abc0e6a5d469097a155",
+  "conditions": {
+    "capacity": 64,
+    "window": 8,
+    "passes": 2000,
+    "worker_threads": 1,
+    "platform": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39",
+    "affinity": [
+      0
+    ],
+    "server_sha256": "21a88335ee9786e12069f595907f0cb9233f78b3cc06712f89043d4e132d46cc"
+  },
+  "replay": {
+    "sent": 32,
+    "max_send_lateness_ms": 9.309676000015315,
+    "mean_send_lateness_ms": 3.1883985937634236
+  },
+  "final_status": {
+    "policy": "fifo",
+    "queue_depth": 0,
+    "queue_capacity": 64,
+    "accepted": 32,
+    "completed": 32,
+    "rejected": 0,
+    "running": true,
+    "active": false,
+    "window": 8,
+    "passes": 2000,
+    "accepting": true,
+    "fatal": false
+  },
+  "command": [
+    "/home/edge/project/linux/build/edge_scheduler",
+    "--bind",
+    "127.0.0.1",
+    "--port",
+    "51435",
+    "--policy",
+    "fifo",
+    "--capacity",
+    "64",
+    "--window",
+    "8",
+    "--passes",
+    "2000",
+    "--output",
+    "results/comparison/run-02-fifo"
+  ],
+  "data_source": "synthetic"
+}

@@ -1,0 +1,10 @@
+.local/
+build/
+build-*/
+__pycache__/
+*.pyc
+.pytest_cache/
+results/
+*.o
+firmware/sdkconfig
+firmware/sdkconfig.old

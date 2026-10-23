@@ -1,141 +1,83 @@
-# ESP32＋Linux 边缘任务调度与运维 Agent
+# ESP32 + Linux 边缘任务调度与只读运维助手
 
-> 当前状态：项目规划。尚未开始代码实现，尚未完成硬件验证或性能测试。
->
-> 计划周期：2026 年 10 月 22 日至 11 月 14 日，每天约 4 小时，共约 96 小时。
+本项目把 ESP32 合成数据上传、Linux C 应用层调度、可重复对照实验和只读解释串起来。原始规划保存在 [docs/original-plan.md](docs/original-plan.md)。当前实现及验收证据见 [docs/implementation.md](docs/implementation.md)。
 
-## 1. 项目目标
+本地已完成 Linux、ESP32 固件构建和集成验证，实测报告及图表见 [验收记录](docs/validation.md) 与 [证据快照](docs/evidence/2026-10-23/README.md)。ESP32 尚未烧录，真实无线通信与断线恢复仍待接板验证。
 
-面向嵌入式 Linux 应用开发，重点练习 C、设备通信、并发编程、任务调度与性能分析。
+这里的优先级是**应用队列选择顺序**：一个工作线程，已开始的任务不被抢占；不修改内核调度器，不提供硬实时保证。
 
-项目要解决的问题：
+## 目录
 
-> 设备不断上传数据，后台又在处理历史数据时，怎样让紧急任务少等待，并让 Agent 根据运行记录解释原因？
+| 路径 | 内容 |
+|---|---|
+| `linux/` | C11 TCP 接收、严格 NDJSON 解析、有界队列、滤波/RMS、日志、C 测试 |
+| `firmware/` | ESP-IDF 设备端，先在本地开发，尚未烧录 |
+| `tools/` | Python 标准库回放、实验、统计、只读查询 |
+| `tests/` | Python 单测与真实服务黑盒集成测试 |
+| `scripts/vmware*`、`deploy/vmware/` | 独立 Ubuntu VMware 环境的创建与连接 |
+| `.local/vmware/` | 本机镜像、虚拟磁盘和私钥，全部忽略提交 |
+| `docs/` | 协议、实现取舍、硬件接入及验证记录 |
 
-第一版使用现有 ESP32 和电脑上的 Linux。电脑承担边缘计算节点的角色，ESP32 负责设备端；后续具备 Linux 开发板时，再进行移植。Arduino 板暂不纳入第一版。
+## 在 Linux 上构建与验证
 
-项目实现的是 **Linux 应用层计算任务调度**，不涉及修改 Linux 内核调度器，也不承诺硬实时保证。
+需要 GCC、Make、Python 3.10+。Ubuntu 可执行 `sudo apt-get install build-essential python3`。
+在项目根目录运行：
 
-## 2. 系统结构
-
-```mermaid
-flowchart LR
-    ESP[ESP32：生成测试数据] -->|Wi-Fi / TCP / 换行分隔 JSON| RX[Linux C：接收线程]
-    RX --> Q[有界任务队列]
-    Q --> WORK[工作线程：滤波与均方根计算]
-    WORK --> DATA[任务结果、耗时记录、状态文件]
-    DATA --> STATS[Python：统计与实验报告]
-    DATA --> AGENT[Python Agent：只读查询]
-    STATS --> AGENT
+```bash
+make -C linux
+make -C linux test
+EDGE_SERVER="$PWD/linux/build/edge_scheduler" python3 -m unittest discover -s tests -v
 ```
 
-关闭 Agent 后，设备通信、任务排队和计算仍然可以独立运行。
+安装 CMake 后，`make test` 还会编译固件的可移植编码器，并执行固件最大帧到 Linux 的跨端测试。`make sanitize` 运行 C 核心的 ASan/UBSan 检查。
 
-## 3. 三个组成部分
+使用全新输出目录启动，已有 `tasks.csv` 时程序拒绝覆盖：
 
-| 部分 | 第一版实现内容 | 对应学习内容 |
-| --- | --- | --- |
-| ESP32 设备端 | 使用 ESP-IDF 和 C，生成测试数据，经 Wi-Fi、TCP 上传，断线后重新连接 | 固件开发、网络通信、缓冲区、错误处理 |
-| Linux 计算端 | 使用 C 接收数据，创建计算任务，排队执行，记录结果与耗时 | Socket、线程、互斥锁、条件变量、内存管理 |
-| Python Agent | 查询系统状态、读取实验报告，根据统计结果解释性能问题 | 工具调用、数据分析、结果解释 |
+```bash
+mkdir -p results
+./linux/build/edge_scheduler --bind 127.0.0.1 --port 9000 \
+  --policy priority --capacity 32 --window 8 --passes 1 --output results/live
+```
 
-### 3.1 ESP32 设备端
+另开终端回放：
 
-- 默认使用明确标注的合成测试数据，不依赖额外购买传感器。
-- 数据消息包含设备编号、序号和样本数据，以换行结束一条 JSON 消息。
-- 建立 TCP 连接，持续发送数据，并处理连接中断后的重新连接。
-- 合成测试数据不能在报告或简历中表述为真实环境采集。
-- 后续接入实际传感器时，保留合成数据作为可重复的测试输入。
+```bash
+python3 -m tools.replay generate results/workload.jsonl
+python3 -m tools.replay send results/workload.jsonl --port 9000
+python3 -m tools.agent status --status results/live/status.json
+```
 
-### 3.2 Linux 计算端：项目核心
+Ctrl+C 或 SIGTERM 停止接收并排空已入队任务。`status.json` 是原子更新的文件快照，异常断电/强杀后可能陈旧；它不替代进程存活检查。`tasks.csv` 每条记录刷新，正常退出时同步到磁盘。
 
-第一版包含一个接收线程、一个工作线程，以及容量有限的任务队列。
+## 可重复的策略对照
 
-| 调度策略 | 行为 |
-| --- | --- |
-| FIFO：先到先处理 | 按任务到达顺序出队执行 |
-| 优先级调度 | 优先选择等待中的高优先级任务，同优先级按到达顺序处理 |
+```bash
+python3 -m tools.replay generate results/workload.jsonl
+python3 -m tools.experiment --workload results/workload.jsonl \
+  --output results/comparison --repeats 3 --capacity 64 --window 8 --passes 2000
+python3 -m tools.agent explain --report results/comparison/report.json
+```
 
-- 计算任务采用“滑动平均滤波＋均方根计算”，分别用于平滑数据和计算信号强度。
-- 小批数据作为紧急任务，大批历史数据作为普通任务。
-- 优先级只决定下一个任务执行谁；已经开始执行的计算继续完成。
-- 队列满时明确拒绝新任务并记录，避免无限占用内存。
-- 正确处理消息分多次到达、多个消息一起到达，以及连接中断。
-- 输出任务结果、耗时记录和状态文件，供统计脚本及 Agent 读取。
+可选图表：安装 Matplotlib 后执行 `python3 -m tools.plot results/comparison/report.json`，输出 PNG 和 SVG。图表展示汇总 P95、每次运行的 P95 点、完成量及拒绝量；核心服务和统计工具不依赖 Matplotlib。
 
-### 3.3 只读运维 Agent
+实验顺序交替，每种策略三次。相同输入文件、间隔、队列、计算参数、线程数和可执行文件；记录文件 SHA256、CPU affinity、系统版本、实际发送迟到和接收时间。可用 `--cpu N` 将回放及子进程固定到允许的一个 CPU。先用 `python3 -c 'import os; print(os.sched_getaffinity(0))'` 查看允许的 CPU。
 
-第一版只保留两个工具：
+`passes` 每次重新计算同一输入，增加**实际计算工作**且不改变结果；计算函数没有 sleep。回放中的 sleep 仅实现任务到达间隔。需要观察积压时调大 passes 或增加批量，日常演示使用 1。主机负载和虚拟化仍会带来噪声，不能预先保证哪种策略快多少。
 
-1. **查询状态**：读取程序输出的运行状态。
-2. **读取实验报告**：读取由统计程序生成的对照实验结果。
+每次实验输出 CSV、状态、服务日志、元数据；最终生成 `report.json` 和 `report.md`，分别给出普通/紧急任务完成量、拒绝量、平均值和 P95。P95 使用 nearest-rank，拒绝任务不混入完成延迟。保留每次结果，避免只看汇总。
 
-Agent 的示例问题：
+## Windows / VMware
 
-> 为什么改成优先级调度后，紧急任务快了，普通任务却更慢了？
+见 [VMware 操作说明](deploy/vmware/README.md)。VM、镜像和项目都在当前目录，不修改现有虚拟机。Linux 编译与实验在 guest 内进行。
 
-统计数字由程序计算，Agent 负责引用和解释已有结果。没有相关数据时，应明确说明无法得出结论。
+## ESP32
 
-## 4. 学习与实施安排
+固件及接线/配置/构建步骤见 [docs/firmware.md](docs/firmware.md)。默认是合成数据，不需要传感器。设备参数由 `idf.py menuconfig` 设置，Wi-Fi 密码只保存在忽略提交的本地配置中。
 
-以下为范围目标，实际遇到问题时优先保住 C 核心、设备通信和实验报告。
+电脑到 NAT 虚拟机的回放可以直接使用 guest 地址；真实 ESP32 通常不能直接访问 VMware NAT 私网。接板时将**本项目 VM**切换到可达的桥接网络，确认开发板与 VM 的 IPv4 连通，再将服务绑定到 VM 的局域网地址。具体防火墙/路由需要按实际网络配置。没有应用层 ACK，发送成功仅表示 TCP 接受数据，不表示服务已入队或完成；最终结果以 Linux CSV 为准。
 
-| 时间 | 预计投入 | 重点 | 阶段成果 |
-| --- | --- | --- | --- |
-| 10/22—10/25 | 16 小时 | Linux 基础、GCC、GDB、C 指针与结构体、本机 TCP 收发 | 能编译和调试 C 程序，客户端能向服务端发送数据 |
-| 10/26—11/1 | 28 小时 | C 任务队列、线程同步、两种调度策略、计算函数 | 先用电脑上的测试程序跑通完整处理流程 |
-| 11/2—11/6 | 20 小时 | ESP32 接入、断线、消息截断、队列满 | 设备通信可以稳定演示 |
-| 11/7—11/10 | 16 小时 | 对照实验、错误修复、结果图表 | 能用实测数据解释两种策略的差异 |
-| 11/11—11/14 | 16 小时 | Agent、文档、演示和简历整理 | 可复现的项目，以及能够独立讲清楚的设计 |
+## 只读助手与范围
 
-每天建议安排：1 小时学习当天需要的知识，2 小时实现，1 小时调试与记录。课程围绕项目补充，无需先看完整套 Linux 教程。
+`python3 -m tools.agent status|report|explain` 提供两个固定文件工具：查询状态、读取报告。解释基于报告里的数字和固定调度规则，缺数据时明确说无法判断；不调用 shell、不控制服务、不依赖模型 API。它是可复现的规则型第一版，尚未接入 LLM。关闭它不影响 C 核心。
 
-最后阶段对 Agent 的投入最多为 8 小时。如果到 11 月 10 日核心仍不稳定，Agent 顺延，优先完成设备通信、C 调度程序和实验报告。
-
-## 5. 对照实验
-
-先用 Linux 本机的数据回放程序跑通实验，再接 ESP32。回放数据需要注明来源是合成测试数据还是实际采集数据。
-
-对比 FIFO 和优先级调度时，保持输入数据、任务到达顺序与时间间隔、计算参数、工作线程数、队列容量和 CPU 条件一致，并重复运行。
-
-重点观察“普通任务积压时，紧急任务随后到达”的场景。
-
-通过调整数据批量与回放速率形成可重复的积压，记录实际处理耗时，不使用休眠伪装计算负载。
-
-| 指标 | 含义 |
-| --- | --- |
-| 排队等待时间 | 任务进入队列到开始执行的时间 |
-| 完成时间 | 任务被 Linux 服务接收到计算完成的时间 |
-| P95 延迟 | 95% 的任务延迟不超过的值，分别统计两类任务 |
-| 完成量 | 实际完成的任务数 |
-| 拒绝量 | 因队列已满等原因而未被接收的任务数 |
-
-高优先级任务等待减少时，同时记录普通任务是否等待更久。优先级调度不一定提升总体吞吐量，所有性能结论以实测数据为准。
-
-## 6. 验收标准
-
-- [ ] **计算正确**：固定输入的 C 计算结果与 Python 参考实现在明确的浮点误差容限内一致。
-- [ ] **消息边界正确**：能处理一条消息拆成多次接收，以及多条消息一起到达。
-- [ ] **断线可恢复**：断开连接后，ESP32 能重新连接并继续发送。
-- [ ] **过载有边界**：队列满时有明确的拒绝记录，内存占用不会随排队无限增长。
-- [ ] **调度可解释**：在相同负载条件下，对比两类任务的等待时间、完成时间、完成量和拒绝量。
-- [ ] **取舍可见**：同时展示紧急任务与普通任务的变化，不预先承诺性能提升比例。
-- [ ] **核心独立运行**：关闭 Agent，设备通信与任务处理仍正常。
-- [ ] **结果可复现**：提供启动步骤、测试数据、实验脚本和简短演示录像。
-
-以上复选框表示后续验收项，当前均未完成。
-
-## 7. 第一版范围与后续扩展
-
-第一版集中完成：**一个设备、一个 Linux 节点、一种计算任务、两种调度策略、一个只读 Agent**。
-
-暂不纳入第一版：GPU/NPU 调度、多节点计算分配、多个 Agent 自主协商、模型训练、Linux 内核调度器修改。
-
-后续在基础版本完成后，再根据实际需求考虑传感器接入、Linux 开发板移植、多工作线程或多节点任务卸载。
-
-## 8. 参考资料
-
-- [乐鑫 ESP-IDF TCP 客户端示例](https://github.com/espressif/esp-idf/blob/master/examples/protocols/sockets/tcp_client/README.md)
-- [ESP-IDF FreeRTOS 官方说明](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/freertos_idf.html)
-- [Linux pthread_create 手册](https://www.man7.org/linux/man-pages/man3/pthread_create.3.html)
-- [Linux 线程同步与条件变量手册](https://www.man7.org/linux/man-pages/man3/pthread_cond_wait.3.html)
+通信协议是受限的合成数据测试协议，见 [docs/protocol.md](docs/protocol.md)。当前适用于本机/可信实验网络；第一版没有鉴权、TLS、持久任务队列、ACK、去重或公平性老化。持续紧急流可能使普通任务饥饿。真实开发板重连、无线网络行为和演示录像需要接板后验收，不能由回放测试替代。

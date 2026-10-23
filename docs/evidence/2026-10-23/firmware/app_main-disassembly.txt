@@ -1,0 +1,249 @@
+
+/home/edge/project/firmware/build/edge_scheduler_device.elf:     file format elf32-xtensa-le
+
+
+Disassembly of section .iram0.vectors:
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+400d9040 <app_main>:
+400d9040:	00e136        	entry	a1, 112
+400d9043:	10a0c2        	movi	a12, 16
+400d9046:	0b0c      	movi.n	a11, 0
+400d9048:	20c1a2        	addi	a10, a1, 32
+400d904b:	dc3681        	l32r	a8, 400d0124 <_stext+0x104> (4000c44c <memset>)
+400d904e:	0008e0        	callx8	a8
+400d9051:	280c      	movi.n	a8, 2
+400d9053:	214182        	s8i	a8, a1, 33
+400d9056:	de3881        	l32r	a8, 400d0938 <_stext+0x918> (2823 <UserFrameTotalSize+0x2723>)
+400d9059:	115182        	s16i	a8, a1, 34
+400d905c:	de4a81        	l32r	a8, 400d0984 <_stext+0x964> (4014d82c <credentials_valid>)
+400d905f:	0008e0        	callx8	a8
+400d9062:	0aac      	beqz.n	a10, 400d9086 <app_main+0x46>
+400d9064:	de36a1        	l32r	a10, 400d093c <_stext+0x91c> (3f4038a4 <_flash_rodata_start+0x3784>)
+400d9067:	de4881        	l32r	a8, 400d0988 <_stext+0x968> (4014d834 <edge_device_id_valid>)
+400d906a:	0008e0        	callx8	a8
+400d906d:	5a9c      	beqz.n	a10, 400d9086 <app_main+0x46>
+400d906f:	24c1c2        	addi	a12, a1, 36
+400d9072:	de2db1        	l32r	a11, 400d0928 <_stext+0x908> (3f403860 <_flash_rodata_start+0x3740>)
+400d9075:	2a0c      	movi.n	a10, 2
+400d9077:	07aae5        	call8	400e0b24 <lwip_inet_pton>
+400d907a:	081a66        	bnei	a10, 1, 400d9086 <app_main+0x46>
+400d907d:	092182        	l32i	a8, a1, 36
+400d9080:	002816        	beqz	a8, 400d9086 <app_main+0x46>
+400d9083:	150866        	bnei	a8, -1, 400d909c <app_main+0x5c>
+400d9086:	b63565        	call8	4008f3dc <esp_log_timestamp>
+400d9089:	ddffb1        	l32r	a11, 400d0888 <_stext+0x868> (3f403550 <_flash_rodata_start+0x3430>)
+400d908c:	0bed      	mov.n	a14, a11
+400d908e:	0add      	mov.n	a13, a10
+400d9090:	de2cc1        	l32r	a12, 400d0940 <_stext+0x920> (3f4038b0 <_flash_rodata_start+0x3790>)
+400d9093:	1a0c      	movi.n	a10, 1
+400d9095:	b626e5        	call8	4008f304 <esp_log>
+400d9098:	0089c6        	j	400d92c3 <app_main+0x283>
+400d909b:	ffe500        	f64cmph	a14, a5, a0, 15
+400d909e:	298101        	l32r	a0, 400a36a4 <_sram1_iram_start+0x36a4>
+400d90a1:	de          	.byte	0xde
+400d90a2:	c08a80        	sub	a8, a10, a8
+400d90a5:	40f880        	nsau	a8, a8
+400d90a8:	418580        	srli	a8, a8, 5
+400d90ab:	de2791        	l32r	a9, 400d0948 <_stext+0x928> (1110 <UserFrameTotalSize+0x1010>)
+400d90ae:	c09a90        	sub	a9, a10, a9
+400d90b1:	40f990        	nsau	a9, a9
+400d90b4:	419590        	srli	a9, a9, 5
+400d90b7:	208890        	or	a8, a8, a9
+400d90ba:	589c      	beqz.n	a8, 400d90d3 <app_main+0x93>
+400d90bc:	021125        	call8	400db1d0 <nvs_flash_erase>
+400d90bf:	da8c      	beqz.n	a10, 400d90d0 <app_main+0x90>
+400d90c1:	de22e1        	l32r	a14, 400d094c <_stext+0x92c> (3f403900 <_flash_rodata_start+0x37e0>)
+400d90c4:	de23d1        	l32r	a13, 400d0950 <_stext+0x930> (3f40ddd0 <__func__$1>)
+400d90c7:	1fa1c2        	movi	a12, 0x11f
+400d90ca:	ddf3b1        	l32r	a11, 400d0898 <_stext+0x878> (3f4035a0 <_flash_rodata_start+0x3480>)
+400d90cd:	afa125        	call8	40088ae0 <_esp_error_check_failed>
+400d90d0:	01fca5        	call8	400db09c <nvs_flash_init>
+400d90d3:	00ea16        	beqz	a10, 400d90e5 <app_main+0xa5>
+400d90d6:	de1fe1        	l32r	a14, 400d0954 <_stext+0x934> (3f403914 <_flash_rodata_start+0x37f4>)
+400d90d9:	de1dd1        	l32r	a13, 400d0950 <_stext+0x930> (3f40ddd0 <__func__$1>)
+400d90dc:	22a1c2        	movi	a12, 0x122
+400d90df:	ddeeb1        	l32r	a11, 400d0898 <_stext+0x878> (3f4035a0 <_flash_rodata_start+0x3480>)
+400d90e2:	af9fe5        	call8	40088ae0 <_esp_error_check_failed>
+400d90e5:	dd0da1        	l32r	a10, 400d051c <_stext+0x4fc> (800 <UserFrameTotalSize+0x700>)
+400d90e8:	001de5        	call8	400d92c8 <edge_frame_capacity>
+400d90eb:	1161a2        	s32i	a10, a1, 68
+400d90ee:	b7a7a5        	call8	40090b68 <malloc>
+400d90f1:	1061a2        	s32i	a10, a1, 64
+400d90f4:	8adc      	bnez.n	a10, 400d9110 <app_main+0xd0>
+400d90f6:	b62e65        	call8	4008f3dc <esp_log_timestamp>
+400d90f9:	dde3b1        	l32r	a11, 400d0888 <_stext+0x868> (3f403550 <_flash_rodata_start+0x3430>)
+400d90fc:	1121f2        	l32i	a15, a1, 68
+400d90ff:	0bed      	mov.n	a14, a11
+400d9101:	0add      	mov.n	a13, a10
+400d9103:	de15c1        	l32r	a12, 400d0958 <_stext+0x938> (3f403918 <_flash_rodata_start+0x37f8>)
+400d9106:	01a0a2        	movi	a10, 1
+400d9109:	b61fa5        	call8	4008f304 <esp_log>
+400d910c:	006cc6        	j	400d92c3 <app_main+0x283>
+400d910f:	8f2500        	f64cmph	a2, a5, a0, 8
+400d9112:	ff          	.byte	0xff
+400d9113:	f87c      	movi.n	a8, -1
+400d9115:	c189      	s32i.n	a8, a1, 48
+400d9117:	e8a382        	movi	a8, 0x3e8
+400d911a:	d189      	s32i.n	a8, a1, 52
+400d911c:	b62be5        	call8	4008f3dc <esp_log_timestamp>
+400d911f:	dddab1        	l32r	a11, 400d0888 <_stext+0x868> (3f403550 <_flash_rodata_start+0x3430>)
+400d9122:	0bed      	mov.n	a14, a11
+400d9124:	20daa0        	or	a13, a10, a10
+400d9127:	de0dc1        	l32r	a12, 400d095c <_stext+0x93c> (3f40394c <_flash_rodata_start+0x382c>)
+400d912a:	03a0a2        	movi	a10, 3
+400d912d:	b61d65        	call8	4008f304 <esp_log>
+400d9130:	160c      	movi.n	a6, 1
+400d9132:	00a052        	movi	a5, 0
+400d9135:	ff8aa5        	call8	400d89e0 <link_usable>
+400d9138:	005a56        	bnez	a10, 400d9141 <app_main+0x101>
+400d913b:	30c1a2        	addi	a10, a1, 48
+400d913e:	ffe225        	call8	400d8f60 <close_socket>
+400d9141:	ffdaa5        	call8	400d8eec <ensure_wifi_connected>
+400d9144:	04a0b2        	movi	a11, 4
+400d9147:	ddcf81        	l32r	a8, 400d0884 <_stext+0x864> (3ffb4a30 <network_events>)
+400d914a:	08a8      	l32i.n	a10, a8, 0
+400d914c:	b0fba5        	call8	4008a108 <xEventGroupClearBits>
+400d914f:	056a27        	bbci	a10, 2, 400d9158 <app_main+0x118>
+400d9152:	30c1a2        	addi	a10, a1, 48
+400d9155:	ffe0a5        	call8	400d8f60 <close_socket>
+400d9158:	0c2182        	l32i	a8, a1, 48
+400d915b:	0318d6        	bgez	a8, 400d9190 <app_main+0x150>
+400d915e:	20c1a2        	addi	a10, a1, 32
+400d9161:	ffe1e5        	call8	400d8f80 <connect_server>
+400d9164:	0c61a2        	s32i	a10, a1, 48
+400d9167:	025ad6        	bgez	a10, 400d9190 <app_main+0x150>
+400d916a:	b62725        	call8	4008f3dc <esp_log_timestamp>
+400d916d:	207aa0        	or	a7, a10, a10
+400d9170:	6ca725        	call8	40145be4 <__errno>
+400d9173:	ddc5b1        	l32r	a11, 400d0888 <_stext+0x868> (3f403550 <_flash_rodata_start+0x3430>)
+400d9176:	0af8      	l32i.n	a15, a10, 0
+400d9178:	0bed      	mov.n	a14, a11
+400d917a:	07dd      	mov.n	a13, a7
+400d917c:	ddf9c1        	l32r	a12, 400d0960 <_stext+0x940> (3f4039a8 <_flash_rodata_start+0x3888>)
+400d917f:	2a0c      	movi.n	a10, 2
+400d9181:	b61825        	call8	4008f304 <esp_log>
+400d9184:	ddf8b1        	l32r	a11, 400d0964 <_stext+0x944> (3f4039d4 <_flash_rodata_start+0x38b4>)
+400d9187:	34c1a2        	addi	a10, a1, 52
+400d918a:	ffd2a5        	call8	400d8eb4 <retry_delay>
+400d918d:	ffe906        	j	400d9135 <app_main+0xf5>
+400d9190:	ddf6a1        	l32r	a10, 400d0968 <_stext+0x948> (fffffff <UserFrameTotalSize+0xffffeff>)
+400d9193:	1076a0        	and	a7, a6, a10
+400d9196:	1195c0        	slli	a9, a5, 4
+400d9199:	358c60        	extui	a8, a6, 28, 4
+400d919c:	208980        	or	a8, a9, a8
+400d919f:	1088a0        	and	a8, a8, a10
+400d91a2:	778a      	add.n	a7, a7, a8
+400d91a4:	758850        	extui	a8, a5, 24, 8
+400d91a7:	778a      	add.n	a7, a7, a8
+400d91a9:	dcb381        	l32r	a8, 400d0478 <_stext+0x458> (cccccccd <_rtc_slow_reserved_end+0x7cccaccd>)
+400d91ac:	a28780        	muluh	a8, a7, a8
+400d91af:	418280        	srli	a8, a8, 2
+400d91b2:	a08880        	addx4	a8, a8, a8
+400d91b5:	c07780        	sub	a7, a7, a8
+400d91b8:	40f780        	nsau	a8, a7
+400d91bb:	418580        	srli	a8, a8, 5
+400d91be:	37cc      	bnez.n	a7, 400d91c5 <app_main+0x185>
+400d91c0:	024c      	movi.n	a2, 64
+400d91c2:	000086        	j	400d91c8 <app_main+0x188>
+400d91c5:	dcd521        	l32r	a2, 400d051c <_stext+0x4fc> (800 <UserFrameTotalSize+0x700>)
+400d91c8:	1129      	s32i.n	a2, a1, 4
+400d91ca:	0189      	s32i.n	a8, a1, 0
+400d91cc:	06ed      	mov.n	a14, a6
+400d91ce:	05fd      	mov.n	a15, a5
+400d91d0:	dddbc1        	l32r	a12, 400d093c <_stext+0x91c> (3f4038a4 <_flash_rodata_start+0x3784>)
+400d91d3:	1121b2        	l32i	a11, a1, 68
+400d91d6:	1021a2        	l32i	a10, a1, 64
+400d91d9:	0010a5        	call8	400d92e4 <edge_frame_build>
+400d91dc:	0a4d      	mov.n	a4, a10
+400d91de:	016a56        	bnez	a10, 400d91f8 <app_main+0x1b8>
+400d91e1:	b61fa5        	call8	4008f3dc <esp_log_timestamp>
+400d91e4:	dda9b1        	l32r	a11, 400d0888 <_stext+0x868> (3f403550 <_flash_rodata_start+0x3430>)
+400d91e7:	0bed      	mov.n	a14, a11
+400d91e9:	0add      	mov.n	a13, a10
+400d91eb:	dde0c1        	l32r	a12, 400d096c <_stext+0x94c> (3f4039e4 <_flash_rodata_start+0x38c4>)
+400d91ee:	01a0a2        	movi	a10, 1
+400d91f1:	b61125        	call8	4008f304 <esp_log>
+400d91f4:	002fc6        	j	400d92b7 <app_main+0x277>
+400d91f7:	0acd00        	add.s	f12, f13, f0
+400d91fa:	1021b2        	l32i	a11, a1, 64
+400d91fd:	c1a8      	l32i.n	a10, a1, 48
+400d91ff:	ffbfa5        	call8	400d8df8 <send_all>
+400d9202:	0a3d      	mov.n	a3, a10
+400d9204:	028ad6        	bgez	a10, 400d9230 <app_main+0x1f0>
+400d9207:	b61d65        	call8	4008f3dc <esp_log_timestamp>
+400d920a:	0a7d      	mov.n	a7, a10
+400d920c:	6c9d65        	call8	40145be4 <__errno>
+400d920f:	dd9eb1        	l32r	a11, 400d0888 <_stext+0x868> (3f403550 <_flash_rodata_start+0x3430>)
+400d9212:	0a88      	l32i.n	a8, a10, 0
+400d9214:	2189      	s32i.n	a8, a1, 8
+400d9216:	0169      	s32i.n	a6, a1, 0
+400d9218:	1159      	s32i.n	a5, a1, 4
+400d921a:	0bed      	mov.n	a14, a11
+400d921c:	07dd      	mov.n	a13, a7
+400d921e:	ddd4c1        	l32r	a12, 400d0970 <_stext+0x950> (3f403a1c <_flash_rodata_start+0x38fc>)
+400d9221:	02a0a2        	movi	a10, 2
+400d9224:	b60de5        	call8	4008f304 <esp_log>
+400d9227:	30c1a2        	addi	a10, a1, 48
+400d922a:	ffd365        	call8	400d8f60 <close_socket>
+400d922d:	000bc6        	j	400d9260 <app_main+0x220>
+400d9230:	b61aa5        	call8	4008f3dc <esp_log_timestamp>
+400d9233:	0add      	mov.n	a13, a10
+400d9235:	77cc      	bnez.n	a7, 400d9240 <app_main+0x200>
+400d9237:	ddbe81        	l32r	a8, 400d0930 <_stext+0x910> (3f403894 <_flash_rodata_start+0x3774>)
+400d923a:	000146        	j	400d9243 <app_main+0x203>
+400d923d:	000000        	ill
+400d9240:	ddbd81        	l32r	a8, 400d0934 <_stext+0x914> (3f40389c <_flash_rodata_start+0x377c>)
+400d9243:	dd91b1        	l32r	a11, 400d0888 <_stext+0x868> (3f403550 <_flash_rodata_start+0x3430>)
+400d9246:	046142        	s32i	a4, a1, 16
+400d9249:	3129      	s32i.n	a2, a1, 12
+400d924b:	2189      	s32i.n	a8, a1, 8
+400d924d:	0169      	s32i.n	a6, a1, 0
+400d924f:	1159      	s32i.n	a5, a1, 4
+400d9251:	0bed      	mov.n	a14, a11
+400d9253:	ddc8c1        	l32r	a12, 400d0974 <_stext+0x954> (3f403a6c <_flash_rodata_start+0x394c>)
+400d9256:	3a0c      	movi.n	a10, 3
+400d9258:	b60aa5        	call8	4008f304 <esp_log>
+400d925b:	e8a382        	movi	a8, 0x3e8
+400d925e:	d189      	s32i.n	a8, a1, 52
+400d9260:	1c0666        	bnei	a6, -1, 400d9280 <app_main+0x240>
+400d9263:	ddc581        	l32r	a8, 400d0978 <_stext+0x958> (1fffff <UserFrameTotalSize+0x1ffeff>)
+400d9266:	169587        	bne	a5, a8, 400d9280 <app_main+0x240>
+400d9269:	b61725        	call8	4008f3dc <esp_log_timestamp>
+400d926c:	dd87b1        	l32r	a11, 400d0888 <_stext+0x868> (3f403550 <_flash_rodata_start+0x3430>)
+400d926f:	0bed      	mov.n	a14, a11
+400d9271:	0add      	mov.n	a13, a10
+400d9273:	ddc2c1        	l32r	a12, 400d097c <_stext+0x95c> (3f403ab0 <_flash_rodata_start+0x3990>)
+400d9276:	01a0a2        	movi	a10, 1
+400d9279:	b608a5        	call8	4008f304 <esp_log>
+400d927c:	000dc6        	j	400d92b7 <app_main+0x277>
+400d927f:	861b00        	lsi	f0, a11, 0x218
+400d9282:	190c      	movi.n	a9, 1
+400d9284:	013867        	bltu	a8, a6, 400d9289 <app_main+0x249>
+400d9287:	090c      	movi.n	a9, 0
+400d9289:	086d      	mov.n	a6, a8
+400d928b:	595a      	add.n	a5, a9, a5
+400d928d:	00b3d6        	bgez	a3, 400d929c <app_main+0x25c>
+400d9290:	ddbcb1        	l32r	a11, 400d0980 <_stext+0x960> (3f403afc <_flash_rodata_start+0x39dc>)
+400d9293:	34c1a2        	addi	a10, a1, 52
+400d9296:	ffc1e5        	call8	400d8eb4 <retry_delay>
+400d9299:	ffa606        	j	400d9135 <app_main+0xf5>
+400d929c:	dd7a81        	l32r	a8, 400d0884 <_stext+0x864> (3ffb4a30 <network_events>)
+400d929f:	0878      	l32i.n	a7, a8, 0
+400d92a1:	faa0a2        	movi	a10, 250
+400d92a4:	ff71a5        	call8	400d89c0 <ticks_ms>
+400d92a7:	0aed      	mov.n	a14, a10
+400d92a9:	0d0c      	movi.n	a13, 0
+400d92ab:	0dcd      	mov.n	a12, a13
+400d92ad:	4b0c      	movi.n	a11, 4
+400d92af:	07ad      	mov.n	a10, a7
+400d92b1:	b0d525        	call8	4008a004 <xEventGroupWaitBits>
+400d92b4:	ff9f46        	j	400d9135 <app_main+0xf5>
+400d92b7:	30c1a2        	addi	a10, a1, 48
+400d92ba:	ffca65        	call8	400d8f60 <close_socket>
+400d92bd:	1021a2        	l32i	a10, a1, 64
+400d92c0:	b78c65        	call8	40090b88 <cfree>
+400d92c3:	f01d      	retw.n
