@@ -12,7 +12,9 @@
 
 ## 本机已运行
 
-当前环境为 Windows，Python 3.12；当前会话没有合作者的 VMware 虚拟机和 Linux C 编译环境。
+**更新：下方 Windows 记录保留为历史。安装 WSL 后已在本机 Ubuntu 补齐 Linux 验证：普通构建与 ASan/UBSan 构建均为 42 项全部通过、0 跳过，另完成六次调度实测。新证据及复现步骤见 [WSL 本机补验](evidence/2026-10-25-wsl/README.md)。**
+
+首次验证环境为 Windows、Python 3.12；当时没有合作者的 VMware 虚拟机和 Linux C 编译环境。
 
 | 检查 | 结果与边界 |
 | --- | --- |

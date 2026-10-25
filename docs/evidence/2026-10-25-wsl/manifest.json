@@ -1,0 +1,62 @@
+{
+  "date": "2026-10-25",
+  "source": "local snapshot of PR #1 implementation; verify source_sha256 for exact bytes",
+  "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "3.12.3",
+  "gcc": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "normal_tests": {
+    "run": 42,
+    "passed": 42,
+    "skipped": 0
+  },
+  "sanitizer_tests": {
+    "run": 42,
+    "passed": 42,
+    "skipped": 0
+  },
+  "portable_firmware_ctest": {
+    "run": 1,
+    "passed": 1
+  },
+  "source_sha256": {
+    "linux/Makefile": "03fa7e625847ce450424e6c41eb311a5076882052e99c52ff2ba108e18fe4f2e",
+    "linux/include/edge.h": "83104275a16b1f54d43f83e7cbb645a4fbcf9a99ee90eef036df3112f2b658f7",
+    "linux/src/core.c": "63c1db42a74b3a444ed08e4b8d3b20543afa77e29f215f873d62c607393b781c",
+    "linux/src/main.c": "e0557e9a240d63897ab894e16ff99d305f128b0d8ef8f7075e41dae74ce2ae87",
+    "linux/tests/test_core.c": "0bf534ec24da0838ed0bd92aead6cf24641add7da1c1f5525cf0efc65447a2e8",
+    "firmware/.gitignore": "1428f9b38a97a0748f6fb6fe02561ea1df8319ac9293dda495cd987bfb5810cd",
+    "firmware/CMakeLists.txt": "95d08e5ed0e78ba37919199b251e9a0c1ceb5f7e63843097553124f330b848ff",
+    "firmware/main/CMakeLists.txt": "75c63b836f48552f813878f02c82f99a01555f7574c122ed069ecef95363294d",
+    "firmware/main/Kconfig.projbuild": "e8155d04193580ba7aa92ae5193bbce1468c811a489fb36bc4fbf59e4198a10d",
+    "firmware/main/frame.c": "aa5c8ad274ca6a6e04a7df4d71bfa7a92715761bbc46d68400479aa752c05506",
+    "firmware/main/frame.h": "deea9bf4b81dde2e65a64dee6a31183844348e7355f7f7e964b8365262edf4ee",
+    "firmware/main/main.c": "a17945a794bffd26c15032e353a21187432ac99fa0fe0a07c81691b2308da25b",
+    "firmware/sdkconfig.defaults": "62b49b0e98688ed3e34cbcbe647d85b0e804c14541bb3cf116c17af981e953f3",
+    "firmware/sdkconfig.example": "67fcbff9595a3cf5c41d0c5aa8d2b57160c3dcea6ece642d0640ae721ca8e129",
+    "firmware/tests/CMakeLists.txt": "856381e00d9efbd3e6d1347ffe7a3caa2e27a708964ceb77bdf886a90f53e9cd",
+    "firmware/tests/test_frame.c": "14ff55216adca775a339246e67b5a5939b9ad7c3b25a0d305c07fbe8bc5a39dc",
+    "tools/__init__.py": "65b700b5b623e1ee659f39d7040d07ab308333f588e3f76abde54c78c88e39f8",
+    "tools/agent.py": "16000356b49aa6ed441772c678dd50511b1f5790b79d96ff1b5010d97a4e93ec",
+    "tools/experiment.py": "4c18add3faeeddb60aff87d444af754c049ef4c2db033a2aed3fb1da255cb2a9",
+    "tools/llm.py": "737a2d0a3c830fa7335ac391a65b9ce5192ef888675bcf051c042d638a5a1a15",
+    "tools/plot.py": "fd31be6d272b1f320714a989bf63f54d8930ba9e0ada17b0b252a9bf2ddd6ddf",
+    "tools/protocol.py": "0281963d97f5d9d1db37d51691abe9be10cc90dac13f1af580f796c3359059e8",
+    "tools/replay.py": "fa42b91179587d6cf78f820e3530e589537718ceb6464180ff13f2c277134ad1",
+    "tools/report.py": "1fdaa40e4382c6c8c2997311ef12f1426f037346c79e2949381d494efff6f50e",
+    "tests/test_agent.py": "9cbc26b6b951e1510a0f4ccc93b77b7f85bb02a604b4d2643cacffbbd676b237",
+    "tests/test_firmware_protocol.py": "9ad9e4d53e90f5771552ce0d67113e25c80fe0a0ded76494bfd00e1737523198",
+    "tests/test_integration.py": "1b234049393effc3b175d677e656318925dd0aa852e5ffe7c531dc473f78bdd4",
+    "tests/test_lifecycle.py": "10fdca7b9d774c4965163ddadd16211ba18804742980a1e2a7e47509ac4c93d9",
+    "tests/test_llm_transport.py": "8ca01f0c299a8f35e809dc40c9706a45b5ac11987428b8ddd9ce85de14a6cf99",
+    "tests/test_tools.py": "e468f6141175b2b24f3cb919279b04e3451e4c6fc6ab6433d2dbb32fe4fed5b6",
+    ".github/workflows/ci.yml": "f58b15ecf21218524c1a0c94f5452d3e52f4933287c82e34215a2a8467dbf4a7",
+    "Makefile": "580927f87f747c3fde758faffa08797b84b2c51903c51cc9448fab7f6046ef37"
+  },
+  "excluded": [
+    "ESP32 flashing",
+    "real Wi-Fi",
+    "full ESP-IDF firmware build on this host",
+    "real LLM API"
+  ],
+  "post_test_change": "Only plot title changed from Local VMware measurements to Measured Linux results; charts regenerated and visually checked."
+}
