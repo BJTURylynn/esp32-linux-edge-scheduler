@@ -78,6 +78,17 @@ python3 -m tools.agent explain --report results/comparison/report.json
 
 ## 只读助手与范围
 
-`python3 -m tools.agent status|report|explain` 提供两个固定文件工具：查询状态、读取报告。解释基于报告里的数字和固定调度规则，缺数据时明确说无法判断；不调用 shell、不控制服务、不依赖模型 API。它是可复现的规则型第一版，尚未接入 LLM。关闭它不影响 C 核心。
+`python3 -m tools.agent status|report|explain` 保留原有的离线查询和规则解释。新增 `ask` 自然语言入口：默认仍完全离线，显式选择 `--backend llm` 并配置模型后，模型可以调用同样两个只读工具，读取状态或实验报告，再生成解释。关闭它不影响 C 核心。
+
+无需 API Key 的例子：
+
+```bash
+python3 -m tools.agent ask "为什么紧急任务快了，普通任务却更慢？" \
+  --report docs/evidence/2026-10-23/comparison/report.json
+```
+
+接入支持函数工具调用的 Chat Completions 兼容模型，见 [只读 Agent 使用说明](docs/agent.md)。每次最多 5 次模型请求，禁止模型指定文件路径、执行 shell 或控制服务；API 失败、重复读同一工具或达到次数上限时，立即停止模型循环并回退到本地解释。程序独立显示从同一份证据快照计算的摘要，模型文字仍需与之核对。测试使用模拟模型响应，不调用真实付费 API。
+
+问答扩展及关闭状态修复的本机测试范围见 [2026-10-25 验证记录](docs/validation-2026-10-25.md)；它与前面的 VMware 历史实测分开记录。
 
 通信协议是受限的合成数据测试协议，见 [docs/protocol.md](docs/protocol.md)。当前适用于本机/可信实验网络；第一版没有鉴权、TLS、持久任务队列、ACK、去重或公平性老化。持续紧急流可能使普通任务饥饿。真实开发板重连、无线网络行为和演示录像需要接板后验收，不能由回放测试替代。

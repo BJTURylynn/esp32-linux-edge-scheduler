@@ -265,6 +265,8 @@ static int receive_loop(Server *s, int listener)
     close(listener);
     pthread_mutex_lock(&s->mutex);
     s->stopping = 1;
+    /* Publish closed admission while accepted work is still draining. */
+    if (!write_status(s)) ok = 0;
     pthread_cond_broadcast(&s->ready);
     pthread_mutex_unlock(&s->mutex);
     for (size_t i = 0; i < MAX_CLIENTS; ++i) close_client(&clients[i], s);
