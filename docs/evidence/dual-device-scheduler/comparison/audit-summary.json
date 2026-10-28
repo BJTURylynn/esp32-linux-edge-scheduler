@@ -1,0 +1,62 @@
+[
+  {
+    "run": "run-01-fifo",
+    "policy": "fifo",
+    "policy_ok": true,
+    "urgent_overtake_decisions": 0,
+    "completed": 40,
+    "rejected": 0,
+    "max_numeric_error": 0.0,
+    "max_send_lateness_ms": 2.788340999994034
+  },
+  {
+    "run": "run-01-priority",
+    "policy": "priority",
+    "policy_ok": true,
+    "urgent_overtake_decisions": 8,
+    "completed": 40,
+    "rejected": 0,
+    "max_numeric_error": 0.0,
+    "max_send_lateness_ms": 1.543891999993094
+  },
+  {
+    "run": "run-02-fifo",
+    "policy": "fifo",
+    "policy_ok": true,
+    "urgent_overtake_decisions": 0,
+    "completed": 40,
+    "rejected": 0,
+    "max_numeric_error": 0.0,
+    "max_send_lateness_ms": 5.781272000009718
+  },
+  {
+    "run": "run-02-priority",
+    "policy": "priority",
+    "policy_ok": true,
+    "urgent_overtake_decisions": 8,
+    "completed": 40,
+    "rejected": 0,
+    "max_numeric_error": 0.0,
+    "max_send_lateness_ms": 5.855225999995585
+  },
+  {
+    "run": "run-03-fifo",
+    "policy": "fifo",
+    "policy_ok": true,
+    "urgent_overtake_decisions": 0,
+    "completed": 40,
+    "rejected": 0,
+    "max_numeric_error": 0.0,
+    "max_send_lateness_ms": 4.44547400000306
+  },
+  {
+    "run": "run-03-priority",
+    "policy": "priority",
+    "policy_ok": true,
+    "urgent_overtake_decisions": 8,
+    "completed": 40,
+    "rejected": 0,
+    "max_numeric_error": 0.0,
+    "max_send_lateness_ms": 2.413110000001552
+  }
+]

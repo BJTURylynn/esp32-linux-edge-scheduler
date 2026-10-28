@@ -1,0 +1,683 @@
+{
+  "schema_version": 1,
+  "data_source": "synthetic",
+  "p95_method": "nearest_rank",
+  "comparable_configuration": true,
+  "runs": [
+    {
+      "run": "run-01-fifo",
+      "policy": "fifo",
+      "metrics": {
+        "normal": {
+          "completed": 32,
+          "rejected": 0,
+          "wait_ms": {
+            "mean": 86.6757990625,
+            "p95": 161.82204,
+            "max": 167.133313
+          },
+          "compute_ms": {
+            "mean": 7.34855234375,
+            "p95": 8.358435,
+            "max": 8.546059
+          },
+          "total_ms": {
+            "mean": 94.05372671875,
+            "p95": 168.849164,
+            "max": 174.379341
+          }
+        },
+        "urgent": {
+          "completed": 8,
+          "rejected": 0,
+          "wait_ms": {
+            "mean": 101.574648,
+            "p95": 172.693435,
+            "max": 172.693435
+          },
+          "compute_ms": {
+            "mean": 0.5053225,
+            "p95": 0.946473,
+            "max": 0.946473
+          },
+          "total_ms": {
+            "mean": 102.10562525,
+            "p95": 173.138959,
+            "max": 173.138959
+          }
+        }
+      },
+      "metadata": {
+        "policy": "fifo",
+        "repeat": 1,
+        "workload_sha256": "1e310d71a613479dba9d01263442c405110cd78b21cb46f551ae6774844c6f04",
+        "conditions": {
+          "capacity": 64,
+          "window": 8,
+          "passes": 20000,
+          "worker_threads": 1,
+          "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+          "affinity": [
+            0
+          ],
+          "server_sha256": "17e71028b7984583f4ed7b64d52b1b7ccab8229ee2b5fd5cfddff4951bb33b87"
+        },
+        "replay": {
+          "sent": 40,
+          "max_send_lateness_ms": 2.788340999994034,
+          "mean_send_lateness_ms": 0.26216587499737887
+        },
+        "final_status": {
+          "policy": "fifo",
+          "queue_depth": 0,
+          "queue_capacity": 64,
+          "accepted": 40,
+          "completed": 40,
+          "rejected": 0,
+          "running": true,
+          "active": false,
+          "window": 8,
+          "passes": 20000,
+          "accepting": true,
+          "fatal": false
+        },
+        "command": [
+          "/mnt/d/Projects/esp32-linux-edge-scheduler/linux/build/edge_scheduler",
+          "--bind",
+          "127.0.0.1",
+          "--port",
+          "57111",
+          "--policy",
+          "fifo",
+          "--capacity",
+          "64",
+          "--window",
+          "8",
+          "--passes",
+          "20000",
+          "--output",
+          "/home/Rylynn/edge-results/dual-comparison/run-01-fifo"
+        ],
+        "data_source": "synthetic"
+      },
+      "unclassified_rejections": 0
+    },
+    {
+      "run": "run-01-priority",
+      "policy": "priority",
+      "metrics": {
+        "normal": {
+          "completed": 32,
+          "rejected": 0,
+          "wait_ms": {
+            "mean": 86.03304684375,
+            "p95": 156.08555,
+            "max": 163.057321
+          },
+          "compute_ms": {
+            "mean": 7.217811906250001,
+            "p95": 8.067895,
+            "max": 8.160469
+          },
+          "total_ms": {
+            "mean": 93.279976125,
+            "p95": 163.260002,
+            "max": 169.965177
+          }
+        },
+        "urgent": {
+          "completed": 8,
+          "rejected": 0,
+          "wait_ms": {
+            "mean": 3.97279075,
+            "p95": 7.188838,
+            "max": 7.188838
+          },
+          "compute_ms": {
+            "mean": 0.46733912499999997,
+            "p95": 0.573236,
+            "max": 0.573236
+          },
+          "total_ms": {
+            "mean": 4.457595375,
+            "p95": 7.620245,
+            "max": 7.620245
+          }
+        }
+      },
+      "metadata": {
+        "policy": "priority",
+        "repeat": 1,
+        "workload_sha256": "1e310d71a613479dba9d01263442c405110cd78b21cb46f551ae6774844c6f04",
+        "conditions": {
+          "capacity": 64,
+          "window": 8,
+          "passes": 20000,
+          "worker_threads": 1,
+          "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+          "affinity": [
+            0
+          ],
+          "server_sha256": "17e71028b7984583f4ed7b64d52b1b7ccab8229ee2b5fd5cfddff4951bb33b87"
+        },
+        "replay": {
+          "sent": 40,
+          "max_send_lateness_ms": 1.543891999993094,
+          "mean_send_lateness_ms": 0.16768995000126086
+        },
+        "final_status": {
+          "policy": "priority",
+          "queue_depth": 0,
+          "queue_capacity": 64,
+          "accepted": 40,
+          "completed": 40,
+          "rejected": 0,
+          "running": true,
+          "active": false,
+          "window": 8,
+          "passes": 20000,
+          "accepting": true,
+          "fatal": false
+        },
+        "command": [
+          "/mnt/d/Projects/esp32-linux-edge-scheduler/linux/build/edge_scheduler",
+          "--bind",
+          "127.0.0.1",
+          "--port",
+          "38381",
+          "--policy",
+          "priority",
+          "--capacity",
+          "64",
+          "--window",
+          "8",
+          "--passes",
+          "20000",
+          "--output",
+          "/home/Rylynn/edge-results/dual-comparison/run-01-priority"
+        ],
+        "data_source": "synthetic"
+      },
+      "unclassified_rejections": 0
+    },
+    {
+      "run": "run-02-fifo",
+      "policy": "fifo",
+      "metrics": {
+        "normal": {
+          "completed": 32,
+          "rejected": 0,
+          "wait_ms": {
+            "mean": 83.45032884375,
+            "p95": 159.699077,
+            "max": 165.218683
+          },
+          "compute_ms": {
+            "mean": 7.26465753125,
+            "p95": 7.84997,
+            "max": 8.534006
+          },
+          "total_ms": {
+            "mean": 90.7464976875,
+            "p95": 166.972736,
+            "max": 172.549973
+          }
+        },
+        "urgent": {
+          "completed": 8,
+          "rejected": 0,
+          "wait_ms": {
+            "mean": 98.033186,
+            "p95": 170.844754,
+            "max": 170.844754
+          },
+          "compute_ms": {
+            "mean": 0.6356915,
+            "p95": 1.025761,
+            "max": 1.025761
+          },
+          "total_ms": {
+            "mean": 98.696787875,
+            "p95": 171.938655,
+            "max": 171.938655
+          }
+        }
+      },
+      "metadata": {
+        "policy": "fifo",
+        "repeat": 2,
+        "workload_sha256": "1e310d71a613479dba9d01263442c405110cd78b21cb46f551ae6774844c6f04",
+        "conditions": {
+          "capacity": 64,
+          "window": 8,
+          "passes": 20000,
+          "worker_threads": 1,
+          "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+          "affinity": [
+            0
+          ],
+          "server_sha256": "17e71028b7984583f4ed7b64d52b1b7ccab8229ee2b5fd5cfddff4951bb33b87"
+        },
+        "replay": {
+          "sent": 40,
+          "max_send_lateness_ms": 5.781272000009718,
+          "mean_send_lateness_ms": 0.41731872500042744
+        },
+        "final_status": {
+          "policy": "fifo",
+          "queue_depth": 0,
+          "queue_capacity": 64,
+          "accepted": 40,
+          "completed": 40,
+          "rejected": 0,
+          "running": true,
+          "active": false,
+          "window": 8,
+          "passes": 20000,
+          "accepting": true,
+          "fatal": false
+        },
+        "command": [
+          "/mnt/d/Projects/esp32-linux-edge-scheduler/linux/build/edge_scheduler",
+          "--bind",
+          "127.0.0.1",
+          "--port",
+          "57917",
+          "--policy",
+          "fifo",
+          "--capacity",
+          "64",
+          "--window",
+          "8",
+          "--passes",
+          "20000",
+          "--output",
+          "/home/Rylynn/edge-results/dual-comparison/run-02-fifo"
+        ],
+        "data_source": "synthetic"
+      },
+      "unclassified_rejections": 0
+    },
+    {
+      "run": "run-02-priority",
+      "policy": "priority",
+      "metrics": {
+        "normal": {
+          "completed": 32,
+          "rejected": 0,
+          "wait_ms": {
+            "mean": 89.7816755625,
+            "p95": 165.901338,
+            "max": 171.530846
+          },
+          "compute_ms": {
+            "mean": 7.41015528125,
+            "p95": 8.250408,
+            "max": 8.465738
+          },
+          "total_ms": {
+            "mean": 97.22427696875,
+            "p95": 173.25506,
+            "max": 178.890799
+          }
+        },
+        "urgent": {
+          "completed": 8,
+          "rejected": 0,
+          "wait_ms": {
+            "mean": 4.9620525,
+            "p95": 9.085103,
+            "max": 9.085103
+          },
+          "compute_ms": {
+            "mean": 0.602580375,
+            "p95": 1.228538,
+            "max": 1.228538
+          },
+          "total_ms": {
+            "mean": 5.59299125,
+            "p95": 9.78668,
+            "max": 9.78668
+          }
+        }
+      },
+      "metadata": {
+        "policy": "priority",
+        "repeat": 2,
+        "workload_sha256": "1e310d71a613479dba9d01263442c405110cd78b21cb46f551ae6774844c6f04",
+        "conditions": {
+          "capacity": 64,
+          "window": 8,
+          "passes": 20000,
+          "worker_threads": 1,
+          "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+          "affinity": [
+            0
+          ],
+          "server_sha256": "17e71028b7984583f4ed7b64d52b1b7ccab8229ee2b5fd5cfddff4951bb33b87"
+        },
+        "replay": {
+          "sent": 40,
+          "max_send_lateness_ms": 5.855225999995585,
+          "mean_send_lateness_ms": 0.5587068249959372
+        },
+        "final_status": {
+          "policy": "priority",
+          "queue_depth": 0,
+          "queue_capacity": 64,
+          "accepted": 40,
+          "completed": 40,
+          "rejected": 0,
+          "running": true,
+          "active": false,
+          "window": 8,
+          "passes": 20000,
+          "accepting": true,
+          "fatal": false
+        },
+        "command": [
+          "/mnt/d/Projects/esp32-linux-edge-scheduler/linux/build/edge_scheduler",
+          "--bind",
+          "127.0.0.1",
+          "--port",
+          "39497",
+          "--policy",
+          "priority",
+          "--capacity",
+          "64",
+          "--window",
+          "8",
+          "--passes",
+          "20000",
+          "--output",
+          "/home/Rylynn/edge-results/dual-comparison/run-02-priority"
+        ],
+        "data_source": "synthetic"
+      },
+      "unclassified_rejections": 0
+    },
+    {
+      "run": "run-03-fifo",
+      "policy": "fifo",
+      "metrics": {
+        "normal": {
+          "completed": 32,
+          "rejected": 0,
+          "wait_ms": {
+            "mean": 84.48006228125,
+            "p95": 159.105729,
+            "max": 164.649001
+          },
+          "compute_ms": {
+            "mean": 7.26873071875,
+            "p95": 8.399302,
+            "max": 8.663
+          },
+          "total_ms": {
+            "mean": 91.7829343125,
+            "p95": 166.363469,
+            "max": 171.67942
+          }
+        },
+        "urgent": {
+          "completed": 8,
+          "rejected": 0,
+          "wait_ms": {
+            "mean": 99.114167125,
+            "p95": 169.90045,
+            "max": 169.90045
+          },
+          "compute_ms": {
+            "mean": 0.46133875,
+            "p95": 0.558939,
+            "max": 0.558939
+          },
+          "total_ms": {
+            "mean": 99.5927245,
+            "p95": 170.356183,
+            "max": 170.356183
+          }
+        }
+      },
+      "metadata": {
+        "policy": "fifo",
+        "repeat": 3,
+        "workload_sha256": "1e310d71a613479dba9d01263442c405110cd78b21cb46f551ae6774844c6f04",
+        "conditions": {
+          "capacity": 64,
+          "window": 8,
+          "passes": 20000,
+          "worker_threads": 1,
+          "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+          "affinity": [
+            0
+          ],
+          "server_sha256": "17e71028b7984583f4ed7b64d52b1b7ccab8229ee2b5fd5cfddff4951bb33b87"
+        },
+        "replay": {
+          "sent": 40,
+          "max_send_lateness_ms": 4.44547400000306,
+          "mean_send_lateness_ms": 0.3100782500113154
+        },
+        "final_status": {
+          "policy": "fifo",
+          "queue_depth": 0,
+          "queue_capacity": 64,
+          "accepted": 40,
+          "completed": 40,
+          "rejected": 0,
+          "running": true,
+          "active": false,
+          "window": 8,
+          "passes": 20000,
+          "accepting": true,
+          "fatal": false
+        },
+        "command": [
+          "/mnt/d/Projects/esp32-linux-edge-scheduler/linux/build/edge_scheduler",
+          "--bind",
+          "127.0.0.1",
+          "--port",
+          "60289",
+          "--policy",
+          "fifo",
+          "--capacity",
+          "64",
+          "--window",
+          "8",
+          "--passes",
+          "20000",
+          "--output",
+          "/home/Rylynn/edge-results/dual-comparison/run-03-fifo"
+        ],
+        "data_source": "synthetic"
+      },
+      "unclassified_rejections": 0
+    },
+    {
+      "run": "run-03-priority",
+      "policy": "priority",
+      "metrics": {
+        "normal": {
+          "completed": 32,
+          "rejected": 0,
+          "wait_ms": {
+            "mean": 87.93539825,
+            "p95": 164.531785,
+            "max": 170.136014
+          },
+          "compute_ms": {
+            "mean": 7.41235996875,
+            "p95": 7.97138,
+            "max": 8.043709
+          },
+          "total_ms": {
+            "mean": 95.37201478125,
+            "p95": 171.795067,
+            "max": 177.422488
+          }
+        },
+        "urgent": {
+          "completed": 8,
+          "rejected": 0,
+          "wait_ms": {
+            "mean": 4.501154625,
+            "p95": 8.117088,
+            "max": 8.117088
+          },
+          "compute_ms": {
+            "mean": 0.585821125,
+            "p95": 1.09275,
+            "max": 1.09275
+          },
+          "total_ms": {
+            "mean": 5.135263125,
+            "p95": 8.82155,
+            "max": 8.82155
+          }
+        }
+      },
+      "metadata": {
+        "policy": "priority",
+        "repeat": 3,
+        "workload_sha256": "1e310d71a613479dba9d01263442c405110cd78b21cb46f551ae6774844c6f04",
+        "conditions": {
+          "capacity": 64,
+          "window": 8,
+          "passes": 20000,
+          "worker_threads": 1,
+          "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+          "affinity": [
+            0
+          ],
+          "server_sha256": "17e71028b7984583f4ed7b64d52b1b7ccab8229ee2b5fd5cfddff4951bb33b87"
+        },
+        "replay": {
+          "sent": 40,
+          "max_send_lateness_ms": 2.413110000001552,
+          "mean_send_lateness_ms": 0.20518990000587664
+        },
+        "final_status": {
+          "policy": "priority",
+          "queue_depth": 0,
+          "queue_capacity": 64,
+          "accepted": 40,
+          "completed": 40,
+          "rejected": 0,
+          "running": true,
+          "active": false,
+          "window": 8,
+          "passes": 20000,
+          "accepting": true,
+          "fatal": false
+        },
+        "command": [
+          "/mnt/d/Projects/esp32-linux-edge-scheduler/linux/build/edge_scheduler",
+          "--bind",
+          "127.0.0.1",
+          "--port",
+          "50259",
+          "--policy",
+          "priority",
+          "--capacity",
+          "64",
+          "--window",
+          "8",
+          "--passes",
+          "20000",
+          "--output",
+          "/home/Rylynn/edge-results/dual-comparison/run-03-priority"
+        ],
+        "data_source": "synthetic"
+      },
+      "unclassified_rejections": 0
+    }
+  ],
+  "pooled": {
+    "fifo": {
+      "normal": {
+        "completed": 96,
+        "rejected": 0,
+        "wait_ms": {
+          "mean": 84.8687300625,
+          "p95": 159.699077,
+          "max": 167.133313
+        },
+        "compute_ms": {
+          "mean": 7.2939801979166665,
+          "p95": 8.358435,
+          "max": 8.663
+        },
+        "total_ms": {
+          "mean": 92.19438623958332,
+          "p95": 166.972736,
+          "max": 174.379341
+        }
+      },
+      "urgent": {
+        "completed": 24,
+        "rejected": 0,
+        "wait_ms": {
+          "mean": 99.57400037500001,
+          "p95": 170.844754,
+          "max": 172.693435
+        },
+        "compute_ms": {
+          "mean": 0.5341175833333333,
+          "p95": 0.946473,
+          "max": 1.025761
+        },
+        "total_ms": {
+          "mean": 100.13171254166667,
+          "p95": 171.938655,
+          "max": 173.138959
+        }
+      }
+    },
+    "priority": {
+      "normal": {
+        "completed": 96,
+        "rejected": 0,
+        "wait_ms": {
+          "mean": 87.91670688541666,
+          "p95": 163.057321,
+          "max": 171.530846
+        },
+        "compute_ms": {
+          "mean": 7.34677571875,
+          "p95": 8.111617,
+          "max": 8.465738
+        },
+        "total_ms": {
+          "mean": 95.29208929166667,
+          "p95": 169.965177,
+          "max": 178.890799
+        }
+      },
+      "urgent": {
+        "completed": 24,
+        "rejected": 0,
+        "wait_ms": {
+          "mean": 4.478665958333333,
+          "p95": 8.117088,
+          "max": 9.085103
+        },
+        "compute_ms": {
+          "mean": 0.5519135416666666,
+          "p95": 1.09275,
+          "max": 1.228538
+        },
+        "total_ms": {
+          "mean": 5.061949916666667,
+          "p95": 8.82155,
+          "max": 9.78668
+        }
+      }
+    }
+  },
+  "limitations": [
+    "P95 is pooled over completed tasks; rejected tasks have no completion latency.",
+    "Identical schedules do not guarantee identical actual arrivals; inspect send lateness and received_ns.",
+    "VM and host scheduling introduce noise; these are local measurements, not hardware or real-time guarantees."
+  ]
+}

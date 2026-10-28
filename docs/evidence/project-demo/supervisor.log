@@ -1,0 +1,2 @@
+{"event": "ready", "port": 50071, "native_output": "/home/Rylynn/edge-results/project-demo-v2"}
+{"event": "finished", "success": true, "native_output": "/home/Rylynn/edge-results/project-demo-v2", "port": 50071, "expected": 40, "policy": "priority", "error": null, "final_status": {"policy": "priority", "queue_depth": 0, "queue_capacity": 64, "accepted": 40, "completed": 40, "rejected": 0, "running": false, "active": false, "window": 8, "passes": 1000000, "accepting": false, "fatal": false}}

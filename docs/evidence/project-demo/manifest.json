@@ -1,0 +1,26 @@
+{
+  "hardware": true,
+  "completed": 40,
+  "rejected": 0,
+  "policy": "priority",
+  "passes": 1000000,
+  "urgent_overtake_decisions": 8,
+  "source": "synthetic",
+  "credential_files_included": false,
+  "sha256": {
+    "capture.log": "47c22069f59d32df069270a2faf0147c02117c85a383e4c33e0746d30846d27f",
+    "report.md": "a2da3e8ab8ef35ddaedc088b0c8e433200e96cb3982d36a5057b843ffceca701",
+    "result.json": "539724dde4fb0337d16a9669ff05a13237d068301c34a98ebc96f334a9ecfd36",
+    "supervisor.log": "2a8a4ffc6e953c4a27c33f7b9d5a3e041650348f0f6ba71e140300367f8d48e0",
+    "capture/summary.json": "47c22069f59d32df069270a2faf0147c02117c85a383e4c33e0746d30846d27f",
+    "service/build.log": "9b95c16739f1ced053fa8ccc35cfa01e2a0c1fa36a6fcfc28af465995428f1a7",
+    "service/server.log": "0f3b1c2796a1e3bf847321ad266e7798f5d1ae36fc23db47b6d29f36c8fcd5af",
+    "service/status.json": "a598f73225a5c0fe4ebb56600d315e7ad7a4999fab9325b2725ab75a8aa83e2d",
+    "service/supervisor.json": "95c21419b53e0bd585fcf5432d51ae1000bdb39b84ef3565c92516b8c02e5a7b",
+    "service/tasks.csv": "8e0ff5955f49d50594d00d081e68ea33acd18f0ca29b06f9b282c6605f2ee7e2",
+    "capture/arduino/frames.jsonl": "e3f7757e5f7c716d152d052f0db8483b0a7d52e60b63019c04b130539c40d02e",
+    "capture/arduino/stats.json": "680ed5ed585de03a4ed4ce204fb6cfe4391bac15d08f363052958873f8445e66",
+    "capture/esp32/frames.jsonl": "fb13eea32c1174f33f065cd1e3ec077658a20e4ff12bf2468eb57c5649f34047",
+    "capture/esp32/stats.json": "9bde8ebbfb1f5c7ff0a91f155dc83b537b63d62efc1d966f73f4c1582996e480"
+  }
+}

@@ -1,0 +1,142 @@
+[
+  {
+    "selected": {
+      "task_id": 21,
+      "device_id": "esp32c3-01",
+      "seq": 19,
+      "priority": "urgent"
+    },
+    "earlier_waiting": {
+      "task_id": 19,
+      "device_id": "uno-01",
+      "seq": 0,
+      "priority": "normal"
+    }
+  },
+  {
+    "selected": {
+      "task_id": 25,
+      "device_id": "uno-01",
+      "seq": 4,
+      "priority": "urgent"
+    },
+    "earlier_waiting": {
+      "task_id": 12,
+      "device_id": "esp32c3-01",
+      "seq": 11,
+      "priority": "normal"
+    }
+  },
+  {
+    "selected": {
+      "task_id": 25,
+      "device_id": "uno-01",
+      "seq": 4,
+      "priority": "urgent"
+    },
+    "earlier_waiting": {
+      "task_id": 13,
+      "device_id": "esp32c3-01",
+      "seq": 12,
+      "priority": "normal"
+    }
+  },
+  {
+    "selected": {
+      "task_id": 25,
+      "device_id": "uno-01",
+      "seq": 4,
+      "priority": "urgent"
+    },
+    "earlier_waiting": {
+      "task_id": 14,
+      "device_id": "esp32c3-01",
+      "seq": 13,
+      "priority": "normal"
+    }
+  },
+  {
+    "selected": {
+      "task_id": 25,
+      "device_id": "uno-01",
+      "seq": 4,
+      "priority": "urgent"
+    },
+    "earlier_waiting": {
+      "task_id": 16,
+      "device_id": "esp32c3-01",
+      "seq": 15,
+      "priority": "normal"
+    }
+  },
+  {
+    "selected": {
+      "task_id": 25,
+      "device_id": "uno-01",
+      "seq": 4,
+      "priority": "urgent"
+    },
+    "earlier_waiting": {
+      "task_id": 17,
+      "device_id": "esp32c3-01",
+      "seq": 16,
+      "priority": "normal"
+    }
+  },
+  {
+    "selected": {
+      "task_id": 25,
+      "device_id": "uno-01",
+      "seq": 4,
+      "priority": "urgent"
+    },
+    "earlier_waiting": {
+      "task_id": 18,
+      "device_id": "esp32c3-01",
+      "seq": 17,
+      "priority": "normal"
+    }
+  },
+  {
+    "selected": {
+      "task_id": 25,
+      "device_id": "uno-01",
+      "seq": 4,
+      "priority": "urgent"
+    },
+    "earlier_waiting": {
+      "task_id": 20,
+      "device_id": "esp32c3-01",
+      "seq": 18,
+      "priority": "normal"
+    }
+  },
+  {
+    "selected": {
+      "task_id": 30,
+      "device_id": "uno-01",
+      "seq": 9,
+      "priority": "urgent"
+    },
+    "earlier_waiting": {
+      "task_id": 18,
+      "device_id": "esp32c3-01",
+      "seq": 17,
+      "priority": "normal"
+    }
+  },
+  {
+    "selected": {
+      "task_id": 30,
+      "device_id": "uno-01",
+      "seq": 9,
+      "priority": "urgent"
+    },
+    "earlier_waiting": {
+      "task_id": 20,
+      "device_id": "esp32c3-01",
+      "seq": 18,
+      "priority": "normal"
+    }
+  }
+]

@@ -1,0 +1,48 @@
+{
+  "success": true,
+  "requested_each": 20,
+  "forwarded_total": 40,
+  "sources": {
+    "arduino": {
+      "forwarded": 20,
+      "invalid": 0,
+      "oversized": 0,
+      "incomplete": 0,
+      "serial_opens": 1,
+      "serial_reconnects": 0,
+      "serial_errors": 0,
+      "tcp_connections": 1,
+      "tcp_errors": 0,
+      "dropped": 0,
+      "uncertain": 0,
+      "running": false,
+      "port": "COM10",
+      "baud": 115200,
+      "host": "127.0.0.1",
+      "tcp_port": 9000,
+      "max_frame": 8192,
+      "forwarded_semantics": "sendall completed, NOT server accepted/completed",
+      "last_error": null,
+      "elapsed_seconds": 8.0
+    },
+    "esp32": {
+      "device_host": "172.20.10.14",
+      "device_port": 9001,
+      "linux_host": "127.0.0.1",
+      "linux_port": 9000,
+      "requested": 20,
+      "forwarded": 20,
+      "received_bytes": 16523,
+      "invalid": 0,
+      "oversized": 0,
+      "incomplete": 0,
+      "uncertain": 0,
+      "eof": true,
+      "success": true,
+      "error": null,
+      "semantics": "forwarded means sendall completed, NOT Linux task completion",
+      "elapsed_seconds": 2.156
+    }
+  },
+  "semantics": "forwarded is sendall only; verify Linux CSV separately"
+}
