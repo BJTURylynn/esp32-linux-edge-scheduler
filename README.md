@@ -1,10 +1,12 @@
-# ESP32 + Linux 边缘任务调度与只读运维助手
+# ColorEasyDuino + Linux 边缘任务调度与只读运维助手
 
-本项目把 ESP32 合成数据上传、Linux C 应用层调度、可重复对照实验和只读解释串起来。原始规划保存在 [docs/original-plan.md](docs/original-plan.md)。当前实现及验收证据见 [docs/implementation.md](docs/implementation.md)。
+本项目当前使用粉色立创 ColorEasyDuino（ATmega328P / Arduino Uno）通过 USB 串口上传合成数据，经 Python 转发接入 Linux C 调度器，并由只读助手解释结果。设备没有板载 Wi-Fi；原有 ESP32 固件保留为可选实现。原始规划保存在 [docs/original-plan.md](docs/original-plan.md)。当前实现及验收证据见 [docs/implementation.md](docs/implementation.md)。
 
-本地已完成 Linux、ESP32 固件构建和集成验证，实测报告及图表见 [验收记录](docs/validation.md) 与 [证据快照](docs/evidence/2026-10-23/README.md)。ESP32 尚未烧录，真实无线通信与断线恢复仍待接板验证。
+历史版本已完成 Linux、ESP32 固件构建和集成验证，实测报告及图表见 [验收记录](docs/validation.md) 与 [证据快照](docs/evidence/2026-10-23/README.md)。ESP32 尚未烧录，真实无线通信与断线恢复仍待接板验证。
 
 2026-10-25 已在本机 WSL Ubuntu 补齐此前 Windows 跳过的 9 项：普通与 ASan/UBSan 构建下均为 42 项测试全部通过，另保存六次调度对照实验和离线助手结果。见 [WSL 本机补验记录](docs/evidence/2026-10-25-wsl/README.md)。
+
+粉色板已真实烧录并接入：COM10 → Windows 串口转发 → Ubuntu C 服务，20 个任务全部完成、0 拒绝，逐帧数值参考验证通过。完整自动测试为 59 项通过；见 [粉色板接入说明](docs/coloreasyduino.md) 与 [实物证据](docs/evidence/coloreasyduino-usb/README.md)。
 
 这里的优先级是**应用队列选择顺序**：一个工作线程，已开始的任务不被抢占；不修改内核调度器，不提供硬实时保证。
 
@@ -13,12 +15,17 @@
 | 路径 | 内容 |
 |---|---|
 | `linux/` | C11 TCP 接收、严格 NDJSON 解析、有界队列、滤波/RMS、日志、C 测试 |
-| `firmware/` | ESP-IDF 设备端，先在本地开发，尚未烧录 |
-| `tools/` | Python 标准库回放、实验、统计、只读查询 |
+| `firmware/coloreasyduino/` | 当前 Uno 设备端，串口流式生成数据，已实物烧录 |
+| `firmware/main/` | 原 ESP-IDF 设备端，作为可选实现保留 |
+| `tools/` | 串口桥接（可选 pyserial 依赖），以及标准库回放、实验、统计、只读查询 |
 | `tests/` | Python 单测与真实服务黑盒集成测试 |
 | `scripts/vmware*`、`deploy/vmware/` | 独立 Ubuntu VMware 环境的创建与连接 |
 | `.local/vmware/` | 本机镜像、虚拟磁盘和私钥，全部忽略提交 |
 | `docs/` | 协议、实现取舍、硬件接入及验证记录 |
+
+## 粉色板启动入口
+
+默认接入流程、Arduino 编译/上传、Windows 串口转发和 WSL 服务命令见 [docs/coloreasyduino.md](docs/coloreasyduino.md)。串口不能同时被 IDE Serial Monitor 和桥接程序占用。13 口是约 1 秒心跳；实际计算结果以 Linux CSV 为准。
 
 ## 在 Linux 上构建与验证
 
@@ -72,7 +79,7 @@ python3 -m tools.agent explain --report results/comparison/report.json
 
 见 [VMware 操作说明](deploy/vmware/README.md)。VM、镜像和项目都在当前目录，不修改现有虚拟机。Linux 编译与实验在 guest 内进行。
 
-## ESP32
+## ESP32 可选实现
 
 固件及接线/配置/构建步骤见 [docs/firmware.md](docs/firmware.md)。默认是合成数据，不需要传感器。设备参数由 `idf.py menuconfig` 设置，Wi-Fi 密码只保存在忽略提交的本地配置中。
 

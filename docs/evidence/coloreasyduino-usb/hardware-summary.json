@@ -1,0 +1,240 @@
+{
+  "board": "LCKFB ColorEasyDuino Pink / ATmega328P",
+  "transport": "real CH340 COM10 -> Windows Python bridge -> WSL Ubuntu C TCP9000",
+  "synthetic": true,
+  "forwarded": 20,
+  "completed": 20,
+  "rejected": 0,
+  "normal": 16,
+  "urgent": 4,
+  "numeric_reference_matches": 20,
+  "checks": [
+    {
+      "seq": 0,
+      "priority": "normal",
+      "samples": 256,
+      "reference": {
+        "rms": 61.16242743136406,
+        "mean": -16.380859375
+      },
+      "csv_rms": "61.162427431364058",
+      "csv_mean": "-16.380859375"
+    },
+    {
+      "seq": 1,
+      "priority": "normal",
+      "samples": 256,
+      "reference": {
+        "rms": 60.89577698245483,
+        "mean": -16.166015625
+      },
+      "csv_rms": "60.895776982454827",
+      "csv_mean": "-16.166015625"
+    },
+    {
+      "seq": 2,
+      "priority": "normal",
+      "samples": 256,
+      "reference": {
+        "rms": 60.63149731613821,
+        "mean": -15.951171875
+      },
+      "csv_rms": "60.631497316138208",
+      "csv_mean": "-15.951171875"
+    },
+    {
+      "seq": 3,
+      "priority": "normal",
+      "samples": 256,
+      "reference": {
+        "rms": 60.36961956809795,
+        "mean": -15.736328125
+      },
+      "csv_rms": "60.369619568097953",
+      "csv_mean": "-15.736328125"
+    },
+    {
+      "seq": 4,
+      "priority": "urgent",
+      "samples": 16,
+      "reference": {
+        "rms": 91.19655969388319,
+        "mean": -91.125
+      },
+      "csv_rms": "91.196559693883188",
+      "csv_mean": "-91.125"
+    },
+    {
+      "seq": 5,
+      "priority": "normal",
+      "samples": 256,
+      "reference": {
+        "rms": 59.853195648159634,
+        "mean": -15.306640625
+      },
+      "csv_rms": "59.853195648159634",
+      "csv_mean": "-15.306640625"
+    },
+    {
+      "seq": 6,
+      "priority": "normal",
+      "samples": 256,
+      "reference": {
+        "rms": 59.598713004534545,
+        "mean": -15.091796875
+      },
+      "csv_rms": "59.598713004534545",
+      "csv_mean": "-15.091796875"
+    },
+    {
+      "seq": 7,
+      "priority": "normal",
+      "samples": 256,
+      "reference": {
+        "rms": 59.346759320091564,
+        "mean": -14.876953125
+      },
+      "csv_rms": "59.346759320091564",
+      "csv_mean": "-14.876953125"
+    },
+    {
+      "seq": 8,
+      "priority": "normal",
+      "samples": 256,
+      "reference": {
+        "rms": 59.097366940472696,
+        "mean": -14.662109375
+      },
+      "csv_rms": "59.097366940472696",
+      "csv_mean": "-14.662109375"
+    },
+    {
+      "seq": 9,
+      "priority": "urgent",
+      "samples": 16,
+      "reference": {
+        "rms": 86.20071055391597,
+        "mean": -86.125
+      },
+      "csv_rms": "86.200710553915968",
+      "csv_mean": "-86.125"
+    },
+    {
+      "seq": 10,
+      "priority": "normal",
+      "samples": 256,
+      "reference": {
+        "rms": 58.60639655188566,
+        "mean": -14.232421875
+      },
+      "csv_rms": "58.606396551885659",
+      "csv_mean": "-14.232421875"
+    },
+    {
+      "seq": 11,
+      "priority": "normal",
+      "samples": 256,
+      "reference": {
+        "rms": 58.36488427810745,
+        "mean": -14.017578125
+      },
+      "csv_rms": "58.364884278107453",
+      "csv_mean": "-14.017578125"
+    },
+    {
+      "seq": 12,
+      "priority": "normal",
+      "samples": 256,
+      "reference": {
+        "rms": 58.126064758392815,
+        "mean": -13.802734375
+      },
+      "csv_rms": "58.126064758392815",
+      "csv_mean": "-13.802734375"
+    },
+    {
+      "seq": 13,
+      "priority": "normal",
+      "samples": 256,
+      "reference": {
+        "rms": 57.88997131884654,
+        "mean": -13.587890625
+      },
+      "csv_rms": "57.889971318846541",
+      "csv_mean": "-13.587890625"
+    },
+    {
+      "seq": 14,
+      "priority": "urgent",
+      "samples": 16,
+      "reference": {
+        "rms": 81.20537235922264,
+        "mean": -81.125
+      },
+      "csv_rms": "81.205372359222636",
+      "csv_mean": "-81.125"
+    },
+    {
+      "seq": 15,
+      "priority": "normal",
+      "samples": 256,
+      "reference": {
+        "rms": 57.42609678357807,
+        "mean": -13.158203125
+      },
+      "csv_rms": "57.426096783578068",
+      "csv_mean": "-13.158203125"
+    },
+    {
+      "seq": 16,
+      "priority": "normal",
+      "samples": 256,
+      "reference": {
+        "rms": 57.19838310037159,
+        "mean": -12.943359375
+      },
+      "csv_rms": "57.198383100371593",
+      "csv_mean": "-12.943359375"
+    },
+    {
+      "seq": 17,
+      "priority": "normal",
+      "samples": 256,
+      "reference": {
+        "rms": 56.97353029518949,
+        "mean": -12.728515625
+      },
+      "csv_rms": "56.973530295189491",
+      "csv_mean": "-12.728515625"
+    },
+    {
+      "seq": 18,
+      "priority": "normal",
+      "samples": 256,
+      "reference": {
+        "rms": 56.75157237290325,
+        "mean": -12.513671875
+      },
+      "csv_rms": "56.751572372903247",
+      "csv_mean": "-12.513671875"
+    },
+    {
+      "seq": 19,
+      "priority": "urgent",
+      "samples": 16,
+      "reference": {
+        "rms": 76.21064558183457,
+        "mean": -76.125
+      },
+      "csv_rms": "76.210645581834569",
+      "csv_mean": "-76.125"
+    }
+  ],
+  "not_verified": [
+    "physical USB unplug/reconnect",
+    "power cycle",
+    "real sensor data",
+    "hard realtime",
+    "physical LED visual observation"
+  ]
+}

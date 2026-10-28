@@ -1,0 +1,1 @@
+{"policy":"fifo","queue_depth":0,"queue_capacity":64,"accepted":20,"completed":20,"rejected":0,"running":false,"active":false,"window":8,"passes":20000,"accepting":false,"fatal":false}

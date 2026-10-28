@@ -1,0 +1,111 @@
+make -C linux all
+make[1]: Entering directory '/mnt/d/Projects/esp32-linux-edge-scheduler/linux'
+mkdir -p build
+cc -Iinclude -D_POSIX_C_SOURCE=200809L -O2 -g -std=c11 -Wall -Wextra -Werror -pedantic -pthread -c src/main.c -o build/main.o
+cc -Iinclude -D_POSIX_C_SOURCE=200809L -O2 -g -std=c11 -Wall -Wextra -Werror -pedantic -pthread -c src/core.c -o build/core.o
+cc -O2 -g -std=c11 -Wall -Wextra -Werror -pedantic -pthread  build/main.o build/core.o -lm -pthread -o build/edge_scheduler
+make[1]: Leaving directory '/mnt/d/Projects/esp32-linux-edge-scheduler/linux'
+make -C linux test
+make[1]: Entering directory '/mnt/d/Projects/esp32-linux-edge-scheduler/linux'
+cc -Iinclude -D_POSIX_C_SOURCE=200809L -O2 -g -std=c11 -Wall -Wextra -Werror -pedantic -pthread  tests/test_core.c build/core.o -lm -pthread -o build/test_core
+./build/test_core
+core tests: parser, compute, queue, framing passed
+make[1]: Leaving directory '/mnt/d/Projects/esp32-linux-edge-scheduler/linux'
+cmake -S firmware/tests -B build/firmware-host
+-- The C compiler identification is GNU 13.3.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Configuring done (2.6s)
+-- Generating done (0.2s)
+-- Build files have been written to: /mnt/d/Projects/esp32-linux-edge-scheduler/build/firmware-host
+cmake --build build/firmware-host
+gmake[1]: Entering directory '/mnt/d/Projects/esp32-linux-edge-scheduler/build/firmware-host'
+gmake[2]: Entering directory '/mnt/d/Projects/esp32-linux-edge-scheduler/build/firmware-host'
+gmake[3]: Entering directory '/mnt/d/Projects/esp32-linux-edge-scheduler/build/firmware-host'
+gmake[3]: Leaving directory '/mnt/d/Projects/esp32-linux-edge-scheduler/build/firmware-host'
+gmake[3]: Entering directory '/mnt/d/Projects/esp32-linux-edge-scheduler/build/firmware-host'
+[ 33%] Building C object CMakeFiles/test_frame.dir/test_frame.c.o
+[ 66%] Building C object CMakeFiles/test_frame.dir/mnt/d/Projects/esp32-linux-edge-scheduler/firmware/main/frame.c.o
+[100%] Linking C executable test_frame
+gmake[3]: Leaving directory '/mnt/d/Projects/esp32-linux-edge-scheduler/build/firmware-host'
+[100%] Built target test_frame
+gmake[2]: Leaving directory '/mnt/d/Projects/esp32-linux-edge-scheduler/build/firmware-host'
+gmake[1]: Leaving directory '/mnt/d/Projects/esp32-linux-edge-scheduler/build/firmware-host'
+ctest --test-dir build/firmware-host --output-on-failure
+Internal ctest changing into directory: /mnt/d/Projects/esp32-linux-edge-scheduler/build/firmware-host
+Test project /mnt/d/Projects/esp32-linux-edge-scheduler/build/firmware-host
+    Start 1: firmware_frame
+1/1 Test #1: firmware_frame ...................   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.03 sec
+EDGE_SERVER="/mnt/d/Projects/esp32-linux-edge-scheduler/linux/build/edge_scheduler" EDGE_FRAME_TEST="/mnt/d/Projects/esp32-linux-edge-scheduler/build/firmware-host/test_frame" python3 -m unittest discover -s tests -v
+test_answer_keeps_the_observed_snapshot (test_agent.AgentTests.test_answer_keeps_the_observed_snapshot) ... ok
+test_api_error_falls_back_without_retries (test_agent.AgentTests.test_api_error_falls_back_without_retries) ... ok
+test_both_tools_in_one_response (test_agent.AgentTests.test_both_tools_in_one_response) ... ok
+test_cli_offline_json (test_agent.AgentTests.test_cli_offline_json) ... ok
+test_deep_arguments_are_rejected_without_crashing (test_agent.AgentTests.test_deep_arguments_are_rejected_without_crashing) ... ok
+test_incomparable_report_does_not_claim_a_strategy_improvement (test_agent.AgentTests.test_incomparable_report_does_not_claim_a_strategy_improvement) ... ok
+test_input_and_turn_limits (test_agent.AgentTests.test_input_and_turn_limits) ... ok
+test_missing_files_never_produce_model_claims (test_agent.AgentTests.test_missing_files_never_produce_model_claims) ... ok
+test_model_cannot_choose_paths_or_shell_tools (test_agent.AgentTests.test_model_cannot_choose_paths_or_shell_tools) ... ok
+test_model_selects_tool_and_receives_only_validated_metrics (test_agent.AgentTests.test_model_selects_tool_and_receives_only_validated_metrics) ... ok
+test_nonfinite_nonobject_and_incomplete_evidence (test_agent.AgentTests.test_nonfinite_nonobject_and_incomplete_evidence) ... ok
+test_offline_uses_recorded_values_and_does_not_write (test_agent.AgentTests.test_offline_uses_recorded_values_and_does_not_write) ... ok
+test_repeated_tool_stops_loop (test_agent.AgentTests.test_repeated_tool_stops_loop) ... ok
+test_response_without_evidence_hits_budget_and_discards_guess (test_agent.AgentTests.test_response_without_evidence_hits_budget_and_discards_guess) ... ok
+test_text_without_reading_evidence_requires_an_actual_tool (test_agent.AgentTests.test_text_without_reading_evidence_requires_an_actual_tool) ... ok
+test_tool_call_on_last_turn_is_bounded (test_agent.AgentTests.test_tool_call_on_last_turn_is_bounded) ... ok
+test_maximum_firmware_frame_is_accepted_and_computed (test_firmware_protocol.FirmwareProtocolTests.test_maximum_firmware_frame_is_accepted_and_computed) ... ok
+test_bad_frames_do_not_poison_next_connection (test_integration.ServiceTests.test_bad_frames_do_not_poison_next_connection) ... ok
+test_fragment_coalesce_reconnect_and_numerics (test_integration.ServiceTests.test_fragment_coalesce_reconnect_and_numerics) ... ok
+test_priority_selects_waiting_urgent_without_preemption (test_integration.ServiceTests.test_priority_selects_waiting_urgent_without_preemption) ... ok
+test_queue_overload_is_recorded_and_bounded (test_integration.ServiceTests.test_queue_overload_is_recorded_and_bounded) ... ok
+test_existing_csv_is_preserved (test_lifecycle.LifecycleTests.test_existing_csv_is_preserved) ... ok
+test_invalid_cli_is_rejected (test_lifecycle.LifecycleTests.test_invalid_cli_is_rejected) ... ok
+test_queue_bound_and_shutdown_drain (test_lifecycle.LifecycleTests.test_queue_bound_and_shutdown_drain) ... ok
+test_status_write_failure_is_not_success (test_lifecycle.LifecycleTests.test_status_write_failure_is_not_success) ... ok
+test_bounded_response_allows_exact_limit_and_rejects_extra_byte (test_llm_transport.LLMTransportTests.test_bounded_response_allows_exact_limit_and_rejects_extra_byte) ... ok
+test_default_transport_refuses_redirect_without_second_request (test_llm_transport.LLMTransportTests.test_default_transport_refuses_redirect_without_second_request) ... ok
+test_environment_is_explicit_and_missing_fields_fail (test_llm_transport.LLMTransportTests.test_environment_is_explicit_and_missing_fields_fail) ... ok
+test_http_network_timeout_and_status_failures_are_not_retried (test_llm_transport.LLMTransportTests.test_http_network_timeout_and_status_failures_are_not_retried) ... ok
+test_invalid_input_is_rejected_before_network (test_llm_transport.LLMTransportTests.test_invalid_input_is_rejected_before_network) ... ok
+test_invalid_json_and_encoding_are_sanitized (test_llm_transport.LLMTransportTests.test_invalid_json_and_encoding_are_sanitized) ... ok
+test_malformed_choices_and_assistant_messages (test_llm_transport.LLMTransportTests.test_malformed_choices_and_assistant_messages) ... ok
+test_request_body_headers_and_assistant_result (test_llm_transport.LLMTransportTests.test_request_body_headers_and_assistant_result) ... ok
+test_timeout_bounds_and_empty_configuration (test_llm_transport.LLMTransportTests.test_timeout_bounds_and_empty_configuration) ... ok
+test_tool_call_shape_is_returned_for_agent_validation (test_llm_transport.LLMTransportTests.test_tool_call_shape_is_returned_for_agent_validation) ... ok
+test_url_scheme_host_credentials_and_components (test_llm_transport.LLMTransportTests.test_url_scheme_host_credentials_and_components) ... ok
+test_adaptive_read_blocks_for_one_then_drains_bounded_available_bytes (test_serial_bridge.SerialBridgeTests.test_adaptive_read_blocks_for_one_then_drains_bounded_available_bytes) ... ok
+test_cli_duration_only_may_finish_with_no_frames (test_serial_bridge.SerialBridgeTests.test_cli_duration_only_may_finish_with_no_frames) ... ok
+test_cli_returns_nonzero_when_duration_ends_below_requested_limit (test_serial_bridge.SerialBridgeTests.test_cli_returns_nonzero_when_duration_ends_below_requested_limit) ... Stopped before requested --limit was reached; inspect stats.json.
+ok
+test_configuration_rejects_unbounded_invalid_options (test_serial_bridge.SerialBridgeTests.test_configuration_rejects_unbounded_invalid_options) ... ok
+test_connect_failure_drops_without_claiming_uncertain_send (test_serial_bridge.SerialBridgeTests.test_connect_failure_drops_without_claiming_uncertain_send) ... ok
+test_duration_bounds_disconnected_serial (test_serial_bridge.SerialBridgeTests.test_duration_bounds_disconnected_serial) ... ok
+test_duration_records_dangling_eof (test_serial_bridge.SerialBridgeTests.test_duration_records_dangling_eof) ... ok
+test_exact_limit_and_partial_disconnect (test_serial_bridge.SerialBridgeTests.test_exact_limit_and_partial_disconnect) ... ok
+test_fragmented_coalesced_and_crlf (test_serial_bridge.SerialBridgeTests.test_fragmented_coalesced_and_crlf) ... ok
+test_invalid_and_oversized_never_reach_socket (test_serial_bridge.SerialBridgeTests.test_invalid_and_oversized_never_reach_socket) ... ok
+test_output_never_overwrites_previous_evidence (test_serial_bridge.SerialBridgeTests.test_output_never_overwrites_previous_evidence) ... ok
+test_oversized_line_is_bounded_and_next_line_survives (test_serial_bridge.SerialBridgeTests.test_oversized_line_is_bounded_and_next_line_survives) ... ok
+test_serial_reconnect_discards_partial_frame (test_serial_bridge.SerialBridgeTests.test_serial_reconnect_discards_partial_frame) ... ok
+test_strict_validation_and_canonical_encoding (test_serial_bridge.SerialBridgeTests.test_strict_validation_and_canonical_encoding) ... ok
+test_success_capture_limit_and_clean_close (test_serial_bridge.SerialBridgeTests.test_success_capture_limit_and_clean_close) ... ok
+test_uncertain_send_is_not_replayed (test_serial_bridge.SerialBridgeTests.test_uncertain_send_is_not_replayed) ... ok
+test_uno_frames_are_filtered_forwarded_and_computed (test_serial_device_integration.SerialDeviceIntegrationTests.test_uno_frames_are_filtered_forwarded_and_computed) ... ok
+test_agent_missing_and_tool_allowlist (test_tools.ToolTests.test_agent_missing_and_tool_allowlist) ... ok
+test_nearest_rank_and_missing_observations (test_tools.ToolTests.test_nearest_rank_and_missing_observations) ... ok
+test_protocol_limits (test_tools.ToolTests.test_protocol_limits) ... ok
+test_reference_known_answer (test_tools.ToolTests.test_reference_known_answer) ... ok
+test_schedule_rejects_negative_and_nan (test_tools.ToolTests.test_schedule_rejects_negative_and_nan) ... ok
+test_synthetic_workload_is_repeatable (test_tools.ToolTests.test_synthetic_workload_is_repeatable) ... ok
+
+----------------------------------------------------------------------
+Ran 59 tests in 1.929s
+
+OK
