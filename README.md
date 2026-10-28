@@ -1,8 +1,12 @@
-# ESP32 + Linux 边缘任务调度与只读运维助手
+# ColorEasyDuino + Linux 边缘任务调度与只读运维助手
 
-本项目把 ESP32 合成数据上传、Linux C 应用层调度、可重复对照实验和只读解释串起来。原始规划保存在 [docs/original-plan.md](docs/original-plan.md)。当前实现及验收证据见 [docs/implementation.md](docs/implementation.md)。
+本项目当前使用粉色立创 ColorEasyDuino（ATmega328P / Arduino Uno）通过 USB 串口上传合成数据，经 Python 转发接入 Linux C 调度器，并由只读助手解释结果。设备没有板载 Wi-Fi；原有 ESP32 固件保留为可选实现。原始规划保存在 [docs/original-plan.md](docs/original-plan.md)。当前实现及验收证据见 [docs/implementation.md](docs/implementation.md)。
 
-本地已完成 Linux、ESP32 固件构建和集成验证，实测报告及图表见 [验收记录](docs/validation.md) 与 [证据快照](docs/evidence/2026-10-23/README.md)。ESP32 尚未烧录，真实无线通信与断线恢复仍待接板验证。
+历史版本已完成 Linux、ESP32 固件构建和集成验证，实测报告及图表见 [验收记录](docs/validation.md) 与 [证据快照](docs/evidence/2026-10-23/README.md)。ESP32 尚未烧录，真实无线通信与断线恢复仍待接板验证。
+
+2026-10-25 已在本机 WSL Ubuntu 补齐此前 Windows 跳过的 9 项：普通与 ASan/UBSan 构建下均为 42 项测试全部通过，另保存六次调度对照实验和离线助手结果。见 [WSL 本机补验记录](docs/evidence/2026-10-25-wsl/README.md)。
+
+粉色板已真实烧录并接入：COM10 → Windows 串口转发 → Ubuntu C 服务，20 个任务全部完成、0 拒绝，逐帧数值参考验证通过。完整自动测试为 59 项通过；见 [粉色板接入说明](docs/coloreasyduino.md) 与 [实物证据](docs/evidence/coloreasyduino-usb/README.md)。
 
 这里的优先级是**应用队列选择顺序**：一个工作线程，已开始的任务不被抢占；不修改内核调度器，不提供硬实时保证。
 
@@ -11,12 +15,17 @@
 | 路径 | 内容 |
 |---|---|
 | `linux/` | C11 TCP 接收、严格 NDJSON 解析、有界队列、滤波/RMS、日志、C 测试 |
-| `firmware/` | ESP-IDF 设备端，先在本地开发，尚未烧录 |
-| `tools/` | Python 标准库回放、实验、统计、只读查询 |
+| `firmware/coloreasyduino/` | 当前 Uno 设备端，串口流式生成数据，已实物烧录 |
+| `firmware/main/` | 原 ESP-IDF 设备端，作为可选实现保留 |
+| `tools/` | 串口桥接（可选 pyserial 依赖），以及标准库回放、实验、统计、只读查询 |
 | `tests/` | Python 单测与真实服务黑盒集成测试 |
 | `scripts/vmware*`、`deploy/vmware/` | 独立 Ubuntu VMware 环境的创建与连接 |
 | `.local/vmware/` | 本机镜像、虚拟磁盘和私钥，全部忽略提交 |
 | `docs/` | 协议、实现取舍、硬件接入及验证记录 |
+
+## 粉色板启动入口
+
+默认接入流程、Arduino 编译/上传、Windows 串口转发和 WSL 服务命令见 [docs/coloreasyduino.md](docs/coloreasyduino.md)。串口不能同时被 IDE Serial Monitor 和桥接程序占用。13 口是约 1 秒心跳；实际计算结果以 Linux CSV 为准。
 
 ## 在 Linux 上构建与验证
 
@@ -70,7 +79,7 @@ python3 -m tools.agent explain --report results/comparison/report.json
 
 见 [VMware 操作说明](deploy/vmware/README.md)。VM、镜像和项目都在当前目录，不修改现有虚拟机。Linux 编译与实验在 guest 内进行。
 
-## ESP32
+## ESP32 可选实现
 
 固件及接线/配置/构建步骤见 [docs/firmware.md](docs/firmware.md)。默认是合成数据，不需要传感器。设备参数由 `idf.py menuconfig` 设置，Wi-Fi 密码只保存在忽略提交的本地配置中。
 
@@ -78,6 +87,17 @@ python3 -m tools.agent explain --report results/comparison/report.json
 
 ## 只读助手与范围
 
-`python3 -m tools.agent status|report|explain` 提供两个固定文件工具：查询状态、读取报告。解释基于报告里的数字和固定调度规则，缺数据时明确说无法判断；不调用 shell、不控制服务、不依赖模型 API。它是可复现的规则型第一版，尚未接入 LLM。关闭它不影响 C 核心。
+`python3 -m tools.agent status|report|explain` 保留原有的离线查询和规则解释。新增 `ask` 自然语言入口：默认仍完全离线，显式选择 `--backend llm` 并配置模型后，模型可以调用同样两个只读工具，读取状态或实验报告，再生成解释。关闭它不影响 C 核心。
+
+无需 API Key 的例子：
+
+```bash
+python3 -m tools.agent ask "为什么紧急任务快了，普通任务却更慢？" \
+  --report docs/evidence/2026-10-23/comparison/report.json
+```
+
+接入支持函数工具调用的 Chat Completions 兼容模型，见 [只读 Agent 使用说明](docs/agent.md)。每次最多 5 次模型请求，禁止模型指定文件路径、执行 shell 或控制服务；API 失败、重复读同一工具或达到次数上限时，立即停止模型循环并回退到本地解释。程序独立显示从同一份证据快照计算的摘要，模型文字仍需与之核对。测试使用模拟模型响应，不调用真实付费 API。
+
+问答扩展及关闭状态修复的本机测试范围见 [2026-10-25 验证记录](docs/validation-2026-10-25.md)；它与前面的 VMware 历史实测分开记录。
 
 通信协议是受限的合成数据测试协议，见 [docs/protocol.md](docs/protocol.md)。当前适用于本机/可信实验网络；第一版没有鉴权、TLS、持久任务队列、ACK、去重或公平性老化。持续紧急流可能使普通任务饥饿。真实开发板重连、无线网络行为和演示录像需要接板后验收，不能由回放测试替代。

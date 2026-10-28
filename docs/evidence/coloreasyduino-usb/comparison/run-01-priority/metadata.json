@@ -1,0 +1,53 @@
+{
+  "policy": "priority",
+  "repeat": 1,
+  "workload_sha256": "22d8b4307d59938a97f30bb6f901de409d0541db2212b3f4c2c46a65d19c93d5",
+  "conditions": {
+    "capacity": 64,
+    "window": 8,
+    "passes": 20000,
+    "worker_threads": 1,
+    "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "affinity": [
+      0
+    ],
+    "server_sha256": "17e71028b7984583f4ed7b64d52b1b7ccab8229ee2b5fd5cfddff4951bb33b87"
+  },
+  "replay": {
+    "sent": 20,
+    "max_send_lateness_ms": 1.5138060000008409,
+    "mean_send_lateness_ms": 0.12763119999638675
+  },
+  "final_status": {
+    "policy": "priority",
+    "queue_depth": 0,
+    "queue_capacity": 64,
+    "accepted": 20,
+    "completed": 20,
+    "rejected": 0,
+    "running": true,
+    "active": false,
+    "window": 8,
+    "passes": 20000,
+    "accepting": true,
+    "fatal": false
+  },
+  "command": [
+    "/mnt/d/Projects/esp32-linux-edge-scheduler/linux/build/edge_scheduler",
+    "--bind",
+    "127.0.0.1",
+    "--port",
+    "34063",
+    "--policy",
+    "priority",
+    "--capacity",
+    "64",
+    "--window",
+    "8",
+    "--passes",
+    "20000",
+    "--output",
+    "/home/Rylynn/edge-results/coloreasyduino-comparison/run-01-priority"
+  ],
+  "data_source": "synthetic"
+}

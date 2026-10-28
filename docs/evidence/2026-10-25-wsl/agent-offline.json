@@ -1,0 +1,8 @@
+{
+  "mode": "rules",
+  "answer": "状态快照：policy=priority，队列 0/64，接收=False，计算中=False，已完成=32，已拒绝=0。\n状态文件不是进程存活检查，也不是无线或开发板验收证据。\n依据：results/validation-20261025/comparison/report.json（合成数据，本地实测）。\n紧急任务等待 P95：FIFO 530.318 ms → priority 9.378 ms（降低）。完成量 24 / 24，拒绝量 0 / 0。\n普通任务等待 P95：FIFO 483.976 ms → priority 496.282 ms（升高）。完成量 72 / 72，拒绝量 0 / 0。\n机制解释：priority 优先选取队列中的紧急任务，普通任务可能因此延后；已经执行的任务不会被抢占。\n这解释了可能的取舍；是否出现、幅度多大应以以上数据为准。不能据此断言吞吐量提高或满足硬实时。",
+  "evidence_text": "状态快照：policy=priority，队列 0/64，接收=False，计算中=False，已完成=32，已拒绝=0。\n状态文件不是进程存活检查，也不是无线或开发板验收证据。\n依据：results/validation-20261025/comparison/report.json（合成数据，本地实测）。\n紧急任务等待 P95：FIFO 530.318 ms → priority 9.378 ms（降低）。完成量 24 / 24，拒绝量 0 / 0。\n普通任务等待 P95：FIFO 483.976 ms → priority 496.282 ms（升高）。完成量 72 / 72，拒绝量 0 / 0。\n机制解释：priority 优先选取队列中的紧急任务，普通任务可能因此延后；已经执行的任务不会被抢占。\n这解释了可能的取舍；是否出现、幅度多大应以以上数据为准。不能据此断言吞吐量提高或满足硬实时。",
+  "tool_trace": [],
+  "model_calls": 0,
+  "reason": null
+}

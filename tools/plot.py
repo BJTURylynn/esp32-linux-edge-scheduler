@@ -56,7 +56,7 @@ def main():
     axes[2].set_title("Completion / rejection")
     axes[2].set_ylim(0, max([c+r for c, r in zip(completed, rejected)]+[1])*1.2)
     axes[2].legend(loc="upper right", fontsize=8)
-    fig.suptitle("Synthetic workload · Local VMware measurements\nBars: pooled P95; dots: individual runs. Rejected tasks excluded from latency.", fontsize=12)
+    fig.suptitle("Synthetic workload · Measured Linux results\nBars: pooled P95; dots: individual runs. Rejected tasks excluded from latency.", fontsize=12)
     for suffix in ("png", "svg"):
         path = args.report.with_name(f"comparison.{suffix}")
         fig.savefig(path, dpi=180)

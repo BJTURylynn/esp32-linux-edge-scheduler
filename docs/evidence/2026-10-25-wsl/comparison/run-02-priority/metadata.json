@@ -1,0 +1,53 @@
+{
+  "policy": "priority",
+  "repeat": 2,
+  "workload_sha256": "c544f627861eb1f7ec154c17a6672c3a86550771202b6abc0e6a5d469097a155",
+  "conditions": {
+    "capacity": 64,
+    "window": 8,
+    "passes": 2000,
+    "worker_threads": 1,
+    "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "affinity": [
+      0
+    ],
+    "server_sha256": "f14d5ab142b9bb58c78f3cfa5a3dabcde4bef19f21bf907217c40a1da1bb2dab"
+  },
+  "replay": {
+    "sent": 32,
+    "max_send_lateness_ms": 6.03410300000229,
+    "mean_send_lateness_ms": 0.9207745937501883
+  },
+  "final_status": {
+    "policy": "priority",
+    "queue_depth": 0,
+    "queue_capacity": 64,
+    "accepted": 32,
+    "completed": 32,
+    "rejected": 0,
+    "running": true,
+    "active": false,
+    "window": 8,
+    "passes": 2000,
+    "accepting": true,
+    "fatal": false
+  },
+  "command": [
+    "/home/Rylynn/projects/esp32-linux-edge-scheduler-validation-20261025/linux/build/edge_scheduler",
+    "--bind",
+    "127.0.0.1",
+    "--port",
+    "40539",
+    "--policy",
+    "priority",
+    "--capacity",
+    "64",
+    "--window",
+    "8",
+    "--passes",
+    "2000",
+    "--output",
+    "results/validation-20261025/comparison/run-02-priority"
+  ],
+  "data_source": "synthetic"
+}

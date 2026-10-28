@@ -1,0 +1,7 @@
+run-01-fifo: completed=32 rejected=0
+run-01-priority: completed=32 rejected=0
+run-02-priority: completed=32 rejected=0
+run-02-fifo: completed=32 rejected=0
+run-03-fifo: completed=32 rejected=0
+run-03-priority: completed=32 rejected=0
+results/validation-20261025/comparison/report.md

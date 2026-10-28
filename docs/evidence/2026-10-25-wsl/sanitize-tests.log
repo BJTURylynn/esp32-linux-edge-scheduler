@@ -1,0 +1,47 @@
+test_answer_keeps_the_observed_snapshot (test_agent.AgentTests.test_answer_keeps_the_observed_snapshot) ... ok
+test_api_error_falls_back_without_retries (test_agent.AgentTests.test_api_error_falls_back_without_retries) ... ok
+test_both_tools_in_one_response (test_agent.AgentTests.test_both_tools_in_one_response) ... ok
+test_cli_offline_json (test_agent.AgentTests.test_cli_offline_json) ... ok
+test_deep_arguments_are_rejected_without_crashing (test_agent.AgentTests.test_deep_arguments_are_rejected_without_crashing) ... ok
+test_incomparable_report_does_not_claim_a_strategy_improvement (test_agent.AgentTests.test_incomparable_report_does_not_claim_a_strategy_improvement) ... ok
+test_input_and_turn_limits (test_agent.AgentTests.test_input_and_turn_limits) ... ok
+test_missing_files_never_produce_model_claims (test_agent.AgentTests.test_missing_files_never_produce_model_claims) ... ok
+test_model_cannot_choose_paths_or_shell_tools (test_agent.AgentTests.test_model_cannot_choose_paths_or_shell_tools) ... ok
+test_model_selects_tool_and_receives_only_validated_metrics (test_agent.AgentTests.test_model_selects_tool_and_receives_only_validated_metrics) ... ok
+test_nonfinite_nonobject_and_incomplete_evidence (test_agent.AgentTests.test_nonfinite_nonobject_and_incomplete_evidence) ... ok
+test_offline_uses_recorded_values_and_does_not_write (test_agent.AgentTests.test_offline_uses_recorded_values_and_does_not_write) ... ok
+test_repeated_tool_stops_loop (test_agent.AgentTests.test_repeated_tool_stops_loop) ... ok
+test_response_without_evidence_hits_budget_and_discards_guess (test_agent.AgentTests.test_response_without_evidence_hits_budget_and_discards_guess) ... ok
+test_text_without_reading_evidence_requires_an_actual_tool (test_agent.AgentTests.test_text_without_reading_evidence_requires_an_actual_tool) ... ok
+test_tool_call_on_last_turn_is_bounded (test_agent.AgentTests.test_tool_call_on_last_turn_is_bounded) ... ok
+test_maximum_firmware_frame_is_accepted_and_computed (test_firmware_protocol.FirmwareProtocolTests.test_maximum_firmware_frame_is_accepted_and_computed) ... ok
+test_bad_frames_do_not_poison_next_connection (test_integration.ServiceTests.test_bad_frames_do_not_poison_next_connection) ... ok
+test_fragment_coalesce_reconnect_and_numerics (test_integration.ServiceTests.test_fragment_coalesce_reconnect_and_numerics) ... ok
+test_priority_selects_waiting_urgent_without_preemption (test_integration.ServiceTests.test_priority_selects_waiting_urgent_without_preemption) ... ok
+test_queue_overload_is_recorded_and_bounded (test_integration.ServiceTests.test_queue_overload_is_recorded_and_bounded) ... ok
+test_existing_csv_is_preserved (test_lifecycle.LifecycleTests.test_existing_csv_is_preserved) ... ok
+test_invalid_cli_is_rejected (test_lifecycle.LifecycleTests.test_invalid_cli_is_rejected) ... ok
+test_queue_bound_and_shutdown_drain (test_lifecycle.LifecycleTests.test_queue_bound_and_shutdown_drain) ... ok
+test_status_write_failure_is_not_success (test_lifecycle.LifecycleTests.test_status_write_failure_is_not_success) ... ok
+test_bounded_response_allows_exact_limit_and_rejects_extra_byte (test_llm_transport.LLMTransportTests.test_bounded_response_allows_exact_limit_and_rejects_extra_byte) ... ok
+test_default_transport_refuses_redirect_without_second_request (test_llm_transport.LLMTransportTests.test_default_transport_refuses_redirect_without_second_request) ... ok
+test_environment_is_explicit_and_missing_fields_fail (test_llm_transport.LLMTransportTests.test_environment_is_explicit_and_missing_fields_fail) ... ok
+test_http_network_timeout_and_status_failures_are_not_retried (test_llm_transport.LLMTransportTests.test_http_network_timeout_and_status_failures_are_not_retried) ... ok
+test_invalid_input_is_rejected_before_network (test_llm_transport.LLMTransportTests.test_invalid_input_is_rejected_before_network) ... ok
+test_invalid_json_and_encoding_are_sanitized (test_llm_transport.LLMTransportTests.test_invalid_json_and_encoding_are_sanitized) ... ok
+test_malformed_choices_and_assistant_messages (test_llm_transport.LLMTransportTests.test_malformed_choices_and_assistant_messages) ... ok
+test_request_body_headers_and_assistant_result (test_llm_transport.LLMTransportTests.test_request_body_headers_and_assistant_result) ... ok
+test_timeout_bounds_and_empty_configuration (test_llm_transport.LLMTransportTests.test_timeout_bounds_and_empty_configuration) ... ok
+test_tool_call_shape_is_returned_for_agent_validation (test_llm_transport.LLMTransportTests.test_tool_call_shape_is_returned_for_agent_validation) ... ok
+test_url_scheme_host_credentials_and_components (test_llm_transport.LLMTransportTests.test_url_scheme_host_credentials_and_components) ... ok
+test_agent_missing_and_tool_allowlist (test_tools.ToolTests.test_agent_missing_and_tool_allowlist) ... ok
+test_nearest_rank_and_missing_observations (test_tools.ToolTests.test_nearest_rank_and_missing_observations) ... ok
+test_protocol_limits (test_tools.ToolTests.test_protocol_limits) ... ok
+test_reference_known_answer (test_tools.ToolTests.test_reference_known_answer) ... ok
+test_schedule_rejects_negative_and_nan (test_tools.ToolTests.test_schedule_rejects_negative_and_nan) ... ok
+test_synthetic_workload_is_repeatable (test_tools.ToolTests.test_synthetic_workload_is_repeatable) ... ok
+
+----------------------------------------------------------------------
+Ran 42 tests in 4.276s
+
+OK

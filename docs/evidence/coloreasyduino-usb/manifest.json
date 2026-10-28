@@ -1,0 +1,36 @@
+{
+  "board": "LCKFB-ColorEasyDuino-Pink / ATmega328P",
+  "date": "2026-10-28",
+  "board_target": "arduino:avr:uno",
+  "arduino_cli": "1.5.1",
+  "avr_core": "1.8.8",
+  "firmware_flash_bytes": 2660,
+  "firmware_static_sram_bytes": 201,
+  "usb_port": "COM10",
+  "physical_forwarded": 20,
+  "physical_completed": 20,
+  "physical_rejected": 0,
+  "numeric_matches": 20,
+  "normal_tests_passed": 59,
+  "sanitizer_tests_passed": 59,
+  "hardware_sample_source": "synthetic generated on real MCU; no sensor",
+  "physical_measurement_scope": "real USB serial -> host TCP bridge -> Linux compute; result latencies start on Linux, not end-to-end",
+  "comparison_scope": "20 captured MCU frames replayed with synthetic2ms arrivals,3runs perpolicy,passes20000,not liveUART timing",
+  "not_verified": [
+    "physical USB unplug/reconnect",
+    "power cycle",
+    "physical LED visual observation",
+    "actual sensor",
+    "real LLM API"
+  ],
+  "source_sha256": {
+    "firmware/coloreasyduino/EdgeDevice/EdgeDevice.ino": "83a359f4086864e29df133e85213e17e8694d2eb1e0cd9a2a85f772fdd4c4d6b",
+    "tools/serial_bridge.py": "f9b20ce7f1a2e9a11273735ca7298909e039441f51b84edd59c4566e20cd56ad",
+    "tests/test_serial_bridge.py": "5a359986c2959c942c0323f14902143005f9181a7a772e81d940dd19bab5e291",
+    "tests/test_serial_device_integration.py": "eaeeddc81b6584f5e3f12516726a84c5edb859052a23eef55d1d0618dac24ead",
+    "linux/src/core.c": "63c1db42a74b3a444ed08e4b8d3b20543afa77e29f215f873d62c607393b781c",
+    "linux/src/main.c": "e0557e9a240d63897ab894e16ff99d305f128b0d8ef8f7075e41dae74ce2ae87",
+    "tools/protocol.py": "0281963d97f5d9d1db37d51691abe9be10cc90dac13f1af580f796c3359059e8"
+  },
+  "source_hash_normalization": "SHA256 of source bytes with CRLF normalized to LF, matching repository .gitattributes"
+}

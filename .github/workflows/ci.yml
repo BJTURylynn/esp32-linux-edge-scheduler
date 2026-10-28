@@ -23,3 +23,13 @@ jobs:
       - run: . /opt/esp/idf/export.sh && idf.py set-target esp32 && idf.py build
         shell: bash
         working-directory: firmware
+  uno-firmware:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/setup-arduino-cli@v2
+        with:
+          version: '1.5.1'
+      - run: arduino-cli core update-index
+      - run: arduino-cli core install arduino:avr@1.8.8
+      - run: arduino-cli compile --fqbn arduino:avr:uno firmware/coloreasyduino/EdgeDevice

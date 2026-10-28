@@ -1,0 +1,13 @@
+make -C linux sanitize
+make[1]: Entering directory '/home/Rylynn/projects/esp32-linux-edge-scheduler-validation-20261025/linux'
+make BUILD=build-sanitize CFLAGS='-O1 -g -std=c11 -Wall -Wextra -Werror -pedantic -pthread -fno-omit-frame-pointer -fsanitize=address,undefined' all test
+make[2]: Entering directory '/home/Rylynn/projects/esp32-linux-edge-scheduler-validation-20261025/linux'
+mkdir -p build-sanitize
+cc -Iinclude -D_POSIX_C_SOURCE=200809L -O1 -g -std=c11 -Wall -Wextra -Werror -pedantic -pthread -fno-omit-frame-pointer -fsanitize=address,undefined -c src/main.c -o build-sanitize/main.o
+cc -Iinclude -D_POSIX_C_SOURCE=200809L -O1 -g -std=c11 -Wall -Wextra -Werror -pedantic -pthread -fno-omit-frame-pointer -fsanitize=address,undefined -c src/core.c -o build-sanitize/core.o
+cc -O1 -g -std=c11 -Wall -Wextra -Werror -pedantic -pthread -fno-omit-frame-pointer -fsanitize=address,undefined  build-sanitize/main.o build-sanitize/core.o -lm -pthread -o build-sanitize/edge_scheduler
+cc -Iinclude -D_POSIX_C_SOURCE=200809L -O1 -g -std=c11 -Wall -Wextra -Werror -pedantic -pthread -fno-omit-frame-pointer -fsanitize=address,undefined  tests/test_core.c build-sanitize/core.o -lm -pthread -o build-sanitize/test_core
+./build-sanitize/test_core
+core tests: parser, compute, queue, framing passed
+make[2]: Leaving directory '/home/Rylynn/projects/esp32-linux-edge-scheduler-validation-20261025/linux'
+make[1]: Leaving directory '/home/Rylynn/projects/esp32-linux-edge-scheduler-validation-20261025/linux'

@@ -8,3 +8,5 @@ results/
 *.o
 firmware/sdkconfig
 firmware/sdkconfig.old
+.env
+.env.*

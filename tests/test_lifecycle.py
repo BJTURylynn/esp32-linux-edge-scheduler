@@ -94,6 +94,12 @@ class LifecycleTests(unittest.TestCase):
             client.sendall(message(1) + message(2) + message(3))
             server.wait(lambda s: s["rejected"] == 2)
             # The initial computation is deliberately still running here.
+            server.process.send_signal(signal.SIGTERM)
+            draining = server.wait(lambda s: not s["accepting"])
+            self.assertTrue(draining["running"])
+            self.assertTrue(draining["active"])
+            self.assertEqual((draining["accepted"], draining["completed"],
+                              draining["queue_depth"]), (2, 0, 1))
             self.assertEqual(server.stop(), 0)
         final = server.state()
         self.assertEqual((final["accepted"], final["completed"], final["rejected"]), (2, 2, 2))
