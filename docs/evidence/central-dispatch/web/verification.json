@@ -1,0 +1,36 @@
+{
+  "numerical_verified": true,
+  "succeeded": 6,
+  "terminal_records": 6,
+  "all_tasks_succeeded": true,
+  "devices": {
+    "esp32c3-01": 4,
+    "uno-01": 2
+  },
+  "states": {
+    "succeeded": 6
+  },
+  "max_absolute_error": 2.318846540561026e-06,
+  "tolerance": "1e-4 + 1e-4 * abs(reference)",
+  "zero_duration_records": 0,
+  "duration_semantics": "device micros resolution may round a tiny task to zero; duration alone does not prove execution",
+  "inflight_overlap_observed": true,
+  "scheduling": {
+    "policy": "priority",
+    "policy_verified": true,
+    "violations": [],
+    "dispatched": 6,
+    "max_inflight": 2,
+    "per_device_max_inflight": {
+      "esp32c3-01": 1,
+      "uno-01": 1
+    },
+    "urgent_overtake_decisions": 0,
+    "semantics": "central dispatch-to-terminal intervals; no cross-device clock subtraction"
+  },
+  "policy_verified": true,
+  "max_inflight": 2,
+  "overlap_semantics": "central accept-to-result intervals overlap, not synchronized CPU traces",
+  "data_source": "synthetic",
+  "reference_role": "offline validation only, not task execution"
+}

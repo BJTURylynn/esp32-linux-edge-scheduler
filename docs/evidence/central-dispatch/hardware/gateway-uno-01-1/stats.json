@@ -1,0 +1,10 @@
+{
+  "device": "uno-01",
+  "connections": 1,
+  "forwarded_device": 11,
+  "forwarded_central": 7,
+  "errors": 0,
+  "running": false,
+  "last_error": null,
+  "semantics": "forwarded messages are NOT proof of task completion"
+}

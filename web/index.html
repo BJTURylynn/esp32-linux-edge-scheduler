@@ -4,10 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <meta name="description" content="ESP32 与 Arduino 双设备调度实验的只读运维助手">
+  <meta name="description" content="ESP32 与 Arduino 双设备中央派发、板端计算与只读运维分析">
   <title>EdgeScope · 边缘调度助手</title>
   <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/dispatch.css">
   <script defer src="/app.js"></script>
+  <script defer src="/dispatch.js"></script>
 </head>
 <body>
   <div class="app-shell">
@@ -19,13 +21,14 @@
       <div class="sidebar-project"><span class="project-icon">E</span><div><strong>双设备调度实验</strong><small>ESP32-C3 / Arduino Uno</small></div></div>
       <div class="nav-caption">工作空间</div>
       <nav class="nav-list">
+        <button class="nav-item" data-view="dispatch"><span data-icon="cpu"></span>任务派发<span class="nav-key">LIVE</span></button>
         <button class="nav-item active" data-view="chat" aria-current="page"><span data-icon="chat"></span>运维对话<span class="nav-key">01</span></button>
         <button class="nav-item" data-view="evidence"><span data-icon="chart"></span>调度证据<span class="nav-key">02</span></button>
         <button class="nav-item" id="help-nav"><span data-icon="book"></span>使用说明<span data-icon="external" class="nav-key"></span></button>
       </nav>
       <div class="sidebar-bottom">
-        <div class="readonly-note"><span data-icon="shield"></span><div><strong>只读实验空间</strong><p>读取记录，解释结果。<br>调度仍由 Linux C 执行。</p></div></div>
-        <div class="sidebar-foot"><span class="tiny-dot"></span>本地工作台<span>v1.0</span></div>
+        <div class="readonly-note"><span data-icon="shield"></span><div><strong id="workspace-note-title">只读实验空间</strong><p id="workspace-note-text">读取记录，解释结果。<br>调度仍由 Linux C 执行。</p></div></div>
+        <div class="sidebar-foot"><span class="tiny-dot"></span>本地工作台<span>v2.0</span></div>
       </div>
     </aside>
 
@@ -41,6 +44,7 @@
           <button class="secondary-button" id="refresh-button"><span data-icon="refresh"></span>刷新证据</button>
         </section>
 
+        <div id="analysis-overview">
         <section class="source-workspace" aria-label="选择数据来源">
           <div class="source-options" role="group" aria-label="数据来源">
             <button type="button" class="source-option active" data-source="example" aria-pressed="true"><span data-icon="book"></span><span><strong>示例数据</strong><small>项目作者的历史结果</small></span></button>
@@ -60,6 +64,30 @@
           <article class="stat-card"><div class="stat-label">普通任务等待 P95<span class="stat-icon" data-icon="activity"></span></div><div class="stat-number"><span id="normal-value">—</span><span class="stat-unit">ms</span></div><div class="stat-foot">priority · 对照实验统计</div></article>
         </section>
 
+        </div>
+        <section id="dispatch-view" hidden aria-label="中央任务派发">
+          <div class="dispatch-banner"><div><span class="dispatch-status-dot" id="dispatch-dot"></span><strong id="dispatch-connection">尚未连接中央调度器</strong><span id="dispatch-poll-time"></span></div><p>在这里提交实际任务，交给两块板计算。以下状态来自中央服务，与示例和历史分析独立。</p></div>
+          <div class="dispatch-error" id="dispatch-error" role="alert" hidden></div>
+          <div class="dispatch-nodes" id="dispatch-nodes"></div>
+          <div class="dispatch-stats">
+            <div><span>中央队列</span><strong id="dispatch-queue">—</strong></div><div><span>派发／计算中</span><strong id="dispatch-active">—</strong></div><div><span>设备已完成</span><strong id="dispatch-completed">—</strong></div><div><span>异常／结果未知</span><strong id="dispatch-failures">—</strong></div>
+          </div>
+          <div class="dispatch-control-grid">
+            <section class="dispatch-card"><div class="dispatch-card-heading"><h2>提交计算任务</h2><span class="soft-badge">合成样本 · 板上计算</span></div><p class="dispatch-caption">中央下发参数，设备生成样本并执行滑动平均与 RMS，不在电脑上代算。</p>
+              <form id="dispatch-form"><fieldset id="dispatch-fields" disabled><div class="dispatch-form-grid">
+                <label>任务优先级<select name="priority" id="dispatch-priority"><option value="normal">普通任务</option><option value="urgent">紧急任务</option></select></label>
+                <label>批量任务数<input name="batch_size" type="number" min="1" max="32" step="1" value="1" required></label>
+                <label>样本数<input name="count" id="dispatch-count" type="number" min="1" max="256" step="1" value="256" required></label>
+                <label>滑动窗口<input name="window" type="number" min="1" max="16" step="1" value="8" required></label>
+                <label>计算重复次数<input name="passes" type="number" min="1" max="1000" step="1" value="100" required></label>
+                <label>起始种子<input name="seed" type="number" min="0" max="4294967295" step="1" value="0" required></label>
+              </div><div class="dispatch-submit-row"><span>每台设备同时执行一个任务，已开始的任务不被抢占。</span><button class="primary-button" type="submit" id="dispatch-submit">提交到中央队列</button></div></fieldset></form>
+              <div id="dispatch-receipt" class="dispatch-receipt" role="status" hidden></div>
+            </section>
+            <section class="dispatch-card dispatch-notes"><h2>执行与结果边界</h2><dl><dt>队列策略</dt><dd id="dispatch-policy">—</dd><dt>运行编号</dt><dd id="dispatch-run">—</dd></dl><p>等待和往返耗时由中央记录；设备计算耗时由板端报告，三者分别展示。</p><p>断线或超时可能已执行过计算，但未收到确认结果时只标记“结果未知”。手动重试会创建关联的新任务。</p><p>大模型只读分析，不会替你提交或重新派发任务。</p></section>
+          </div>
+          <section class="dispatch-card dispatch-results"><div class="dispatch-card-heading"><h2>本次运行任务</h2><label>显示<select id="dispatch-filter"><option value="all">全部状态</option><option value="active">排队／执行中</option><option value="succeeded">已完成</option><option value="exception">异常／未知</option></select></label></div><div class="dispatch-table-wrap"><table><thead><tr><th>任务</th><th>优先级</th><th>设备</th><th>状态</th><th>均值 / RMS</th><th>中央等待</th><th>派发往返</th><th>板端计算</th><th>操作</th></tr></thead><tbody id="dispatch-tasks"><tr><td colspan="9">启动中央服务后显示本次运行任务。</td></tr></tbody></table></div><p class="dispatch-caption">仅显示中央当前运行的记录，重启不会恢复旧队列。计算完成以匹配的设备结果为准。</p></section>
+        </section>
         <section class="conversation-layout" id="chat-view">
           <div class="chat-panel">
             <div class="panel-heading"><div class="panel-title"><span class="panel-symbol" data-icon="spark"></span><strong>实验运维对话</strong><span class="soft-badge">只读</span></div><button class="text-button" id="new-chat"><span data-icon="plus"></span>新对话</button></div>
@@ -115,6 +143,11 @@
   <div class="sidebar-scrim" id="sidebar-scrim" hidden></div>
 
   <dialog id="settings-dialog" class="dialog"><form id="settings-form"><div class="dialog-head"><div class="dialog-icon" data-icon="settings"></div><button type="button" class="icon-button close-dialog" aria-label="关闭模型设置"><span data-icon="close"></span></button></div><h2>连接你的模型</h2><p>密钥仅保存在本地后端的本次进程中，页面不会读取已有密钥。</p><label class="field-label">模型</label><div class="model-readonly" id="settings-model">—</div><label class="field-label" for="api-key">API Key</label><input id="api-key" type="password" autocomplete="off" spellcheck="false" placeholder="输入新的 API Key" maxlength="512"><div class="dialog-status" id="settings-status" aria-live="polite"></div><div class="dialog-actions"><button type="button" class="text-button danger-text" id="clear-key">清除当前密钥</button><button type="submit" class="primary-button" id="save-key">保存到本次进程<span data-icon="arrow"></span></button></div></form></dialog>
-  <dialog id="help-dialog" class="dialog help-dialog"><div class="dialog-head"><div class="dialog-icon" data-icon="book"></div><button type="button" class="icon-button close-dialog" aria-label="关闭使用说明"><span data-icon="close"></span></button></div><h2>从问题到可核对的解释</h2><p>这个页面用于解读双设备任务调度实验。每次问题独立分析，后端读取固定的状态和报告，不执行任意命令。</p><ol class="help-steps"><li><strong>选择回答方式</strong><span>大模型模式调用已配置的模型；离线规则模式不发送模型请求。</span></li><li><strong>提出一个完整问题</strong><span>可以询问任务完成量、策略取舍、P95 和证据范围。</span></li><li><strong>核对工具与程序证据</strong><span>回答下方展示实际工具记录。失败回退会单独标记，不伪装成模型回答。</span></li></ol><div class="help-boundary"><span data-icon="lock"></span>模型只读解释；Linux C 程序负责实际调度。页面中的历史快照不代表当前设备在线。</div></dialog>
+  <dialog id="help-dialog" class="dialog help-dialog">
+    <div class="dialog-head"><div class="dialog-icon" data-icon="book"></div><button type="button" class="icon-button close-dialog" aria-label="关闭使用说明"><span data-icon="close"></span></button></div>
+    <h2>从任务到可核对的结果</h2><p>“任务派发”用于提交实际计算；“运维对话”和“调度证据”用于只读分析已有记录。</p>
+    <ol class="help-steps"><li><strong>让设备执行计算</strong><span>启动第二版中央服务，查看设备状态，再提交参数。中央接收不等于设备完成，结果回传后才确认成功。</span></li><li><strong>分析已有实验</strong><span>先选择示例或本机记录，再使用大模型解读或离线规则。每题独立分析，回答下方显示实际工具记录。</span></li><li><strong>核对异常与来源</strong><span>结果未知的任务不会自动重发；手动重试创建新编号。历史快照不能证明设备当前在线。</span></li></ol>
+    <div class="help-boundary"><span data-icon="lock"></span>只有你在任务派发页的明确操作会提交任务。大模型保持只读，不控制设备。</div>
+  </dialog>
 </body>
 </html>

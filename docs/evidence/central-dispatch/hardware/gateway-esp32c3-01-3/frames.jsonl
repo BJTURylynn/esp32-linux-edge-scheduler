@@ -1,0 +1,2 @@
+{"direction":"device","message":{"v":2,"type":"hello","device":"esp32c3-01"},"monotonic_ns":38440687000000}
+{"direction":"central","message":{"v":2,"type":"welcome","session":"a5dace41b355b484"},"monotonic_ns":38440687000000}

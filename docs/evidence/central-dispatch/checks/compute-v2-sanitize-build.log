@@ -1,0 +1,8 @@
+make: Entering directory '/mnt/d/Projects/esp32-linux-edge-scheduler/linux'
+make BUILD=build-sanitize CFLAGS='-O1 -g -std=c11 -Wall -Wextra -Werror -pedantic -pthread -fno-omit-frame-pointer -fsanitize=address,undefined' all test
+make[1]: Entering directory '/mnt/d/Projects/esp32-linux-edge-scheduler/linux'
+make[1]: Nothing to be done for 'all'.
+./build-sanitize/test_core
+core tests: parser, compute, queue, framing passed
+make[1]: Leaving directory '/mnt/d/Projects/esp32-linux-edge-scheduler/linux'
+make: Leaving directory '/mnt/d/Projects/esp32-linux-edge-scheduler/linux'

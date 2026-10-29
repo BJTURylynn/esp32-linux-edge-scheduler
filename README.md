@@ -1,4 +1,22 @@
-# ESP32-C3 / ColorEasyDuino + Linux 边缘任务调度与只读运维助手
+# 双设备边缘计算、中央任务调度与运维工作台
+
+第二版将 ESP32-C3 和粉色 ColorEasyDuino / Arduino Uno 作为计算节点：网页提交任务，Linux C 中央排队派发，两块板实际执行滤波与 RMS 并回传结果。Windows 网关只双向转发，不代算；大模型继续保持只读。原来的“设备上传、Linux 计算”演示与历史证据保留。
+
+## 第二版：中央派发、板上计算
+
+先烧录新的 `ComputeWorker` / `ComputeWiFi` 固件并配置 ESP32 的 2.4GHz Wi-Fi，在项目根目录运行：
+
+```powershell
+python -m tools.dispatch_start --esp-host <ESP32实际IPv4> --uno-port <实际COM口> --web-port 8765 --output D:/Codex/esp32-linux-edge-scheduler/outputs/my-dispatch-run
+```
+
+打开启动器返回的 `http://127.0.0.1:8765/#dispatch`，提交普通或紧急任务，观察两块设备、队列和结果。保持启动终端运行，输入 `STOP` 回车或按 Ctrl+C 停止并归档；输出目录必须为新目录。若已有旧工作台占用端口，先停止旧实例，或用 `--web-port 8766`。
+
+每块板最多一个在途任务，中央容量 64，紧急优先且同级 FIFO；断线／超时保留“结果未知”，不会自动重发。任务是明确标注的合成样本，不是实测传感器数据。构建、协议、数值精度、故障与恢复见[中央派发说明](docs/central-dispatch.md)。
+
+本版已完成双板实物验收：93 个已接收任务中，92 个真实计算成功，1 个为主动断线测试保留的“结果未知”，另验证 1 次队列满拒绝。最大绝对误差约 `4.69e-6`，两设备同时在途上限为 2，审计记录 3 次紧急任务优先选择。普通及 ASan/UBSan 构建均通过 176 项 Python 测试；新旧固件分别编译。详见[实物记录、原始日志与网页截图](docs/evidence/central-dispatch/README.md)。
+
+## 第一版：设备上传、Linux 计算
 
 本项目支持两种已实物接入的设备：ESP32-C3 通过 Wi-Fi/TCP 上传合成数据；粉色立创 ColorEasyDuino（ATmega328P / Arduino Uno）通过 USB 串口上传。两者经 Windows Python 转发接入 WSL Ubuntu 的 Linux C 调度器，并由只读助手解释结果。原有 ESP-IDF 固件也保留为可选实现。原始规划保存在 [docs/original-plan.md](docs/original-plan.md)。当前实现及验收证据见 [docs/implementation.md](docs/implementation.md)。
 
@@ -26,12 +44,13 @@ python -m tools.project_demo --esp-host <ESP32实际IPv4> --uno-port COM10 --out
 
 | 路径 | 内容 |
 |---|---|
-| `linux/` | C11 TCP 接收、严格 NDJSON 解析、有界队列、滤波/RMS、日志、C 测试 |
-| `firmware/coloreasyduino/` | 当前 Uno 设备端，串口流式生成数据，已实物烧录 |
+| `linux/` | 原版 C 计算服务、新版中央派发器、严格协议、有界队列与日志 |
+| `firmware/coloreasyduino/` | Uno 数据源与计算节点两套固件 |
 | `firmware/main/` | 原 ESP-IDF 设备端，作为可选实现保留 |
-| `firmware/esp32c3-arduino/` | ESP32-C3 Arduino Wi-Fi TCP 设备端，已实物烧录 |
-| `tools/` | 串口桥接（可选 pyserial 依赖），以及标准库回放、实验、统计、只读查询 |
-| `web/` | EdgeScope 本地聊天工作台、历史证据概览和分组指标 |
+| `firmware/esp32c3-arduino/` | ESP32-C3 Wi-Fi 数据源与计算节点两套固件 |
+| `firmware/compute-worker/` | 两板共享的单精度计算内核、协议和会话去重 |
+| `tools/` | 单向／双向网关、统一启动、验收、回放、统计与只读查询 |
+| `web/` | 实时任务派发、只读问答与历史数据查看，无前端构建依赖 |
 | `tests/` | Python 单测与真实服务黑盒集成测试 |
 | `scripts/vmware*`、`deploy/vmware/` | 独立 Ubuntu VMware 环境的创建与连接 |
 | `.local/vmware/` | 本机镜像、虚拟磁盘和私钥，全部忽略提交 |
