@@ -6,7 +6,7 @@ LDLIBS += -lm -pthread
 BUILD ?= build
 
 .PHONY: all test integration sanitize clean
-all: $(BUILD)/edge_scheduler
+all: $(BUILD)/edge_scheduler $(BUILD)/edge_dispatcher
 
 $(BUILD):
 	mkdir -p $(BUILD)
@@ -19,6 +19,9 @@ $(BUILD)/main.o: src/main.c include/edge.h | $(BUILD)
 
 $(BUILD)/edge_scheduler: $(BUILD)/main.o $(BUILD)/core.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ $(LDLIBS) -o $@
+
+$(BUILD)/edge_dispatcher: src/dispatch.c | $(BUILD)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $< $(LDLIBS) -o $@
 
 $(BUILD)/test_core: tests/test_core.c $(BUILD)/core.o include/edge.h
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) tests/test_core.c $(BUILD)/core.o $(LDLIBS) -o $@

@@ -1,0 +1,78 @@
+{
+  "hash_semantics": "SHA256 of local tested file bytes; Git may normalize text line endings",
+  "sources": {
+    "linux/src/dispatch.c": "b72f672c92e91e596818a0e14dca06cdf66625ea41e1ca35af72e68bbd988207",
+    "linux/Makefile": "da198a5933e2b160644b08e6a019111905d287577dcae919888dadda2ffe9e22",
+    "tools/web_agent.py": "23be8cd3f48eb1788c8de0a8ee6daa52569d59c460091236aac5e9c9b833cbfa",
+    "firmware/coloreasyduino/ComputeWorker/ComputeWorker.ino": "defc74812a37931a2ea848b3f08bd4eab35698c92506ef42b8c33651a20fedcc",
+    "firmware/esp32c3-arduino/ComputeWiFi/ComputeWiFi.ino": "231378b0d9f9e83b64f62a8ef2e09e3d514d0dd1d044a6cea90e606a64c3662c",
+    "firmware/compute-worker/library.properties": "e18100db865fdccf0a94a8271c894e534d4c79fa634fe9c7a13401ede9dd597c",
+    "firmware/compute-worker/README.md": "62b92b2754feb5b907764ba402ebfdc4e1248ec4b7e9ec0f687295c3d688ea18",
+    "firmware/compute-worker/src/EdgeWorker.h": "b12b1e608ddf903278f787ca8aa271563342312b675ecfa8a5eff9fe98b5f23b",
+    "firmware/compute-worker/src/EdgeWorkerArduino.h": "a0d726e117197d7c86eb4f95873fcac941dd5fd1033d87ebcaabcb28c03ebdf7",
+    "tools/dispatch_client.py": "5d3caada1a4748f5afda950c86713ea200c4b6288c7fb330727e0a506c98b16b",
+    "tools/dispatch_gateway.py": "cc7da6dfffce64f73fe2b040275e416ad3a9f78961826404b622a4566f392720",
+    "tools/dispatch_hardware_check.py": "ca0fe7e47057e5ffa99f070e75f9878adb9dbe34edb8c19ae730c85782f9e04c",
+    "tools/dispatch_service.py": "ca880ea483ce7d896f478b24a36edda93726b35f16edff82007582cb08ff5580",
+    "tools/dispatch_start.py": "0f52832a44f3ef702b1b3f918e9b63cd48397cbb4527b6baeeb249acdfa399c1",
+    "tools/dispatch_verify.py": "8c839f38d1e26d8cd96b549913be90ec4f3b75b7ecb35269bb7fa15bfe050e57",
+    "web/index.html": "fd5dd40d682d164ef1b24a61f74a7001c64e0409ec0572a8c249032c4ff90b16",
+    "web/app.js": "9be86548fd20cadf24beac7ba1a1673ac631ed3dd61ad705bfec45b991d6ee23",
+    "web/dispatch.js": "d3a93be2695b398eb87cf921d6a923d5046b93376430774a9ac4b54d1022d416",
+    "web/dispatch.css": "9e094ff299b1d44d485d0fe9d67dfcf7358650704e965dea3b4df399df3c9ad7"
+  },
+  "firmware_artifacts": {
+    "firmware/esp32c3/boot_app0_flashed.bin": "f94c5d786a7a8fab06ac5d10e33bf37711a6697636dc037559ea19cc410a17f0",
+    "firmware/esp32c3/ComputeWiFi.ino.bin": "930e60e8192fd190b09b361f6069039cf1486f74fb1e7ca68c00ca3c0ee2ca18",
+    "firmware/esp32c3/ComputeWiFi.ino.bootloader.bin": "ebad95d65d4880d2428ed4a8c8509dc2cba09973e3087ffa79f2b3275000e6c3",
+    "firmware/esp32c3/ComputeWiFi.ino.bootloader_flashed.bin": "ebad95d65d4880d2428ed4a8c8509dc2cba09973e3087ffa79f2b3275000e6c3",
+    "firmware/esp32c3/ComputeWiFi.ino.elf": "5f286d60abb3bf9f87cb8eafae7da919633d574a7fc80a2bcc58b60f8995488a",
+    "firmware/esp32c3/ComputeWiFi.ino.map": "45197c6cbe89fdce9fc4258775028e88e72da8d77c00d06e77a9e2658d001a3d",
+    "firmware/esp32c3/ComputeWiFi.ino.merged.bin": "585296f08772c70045bcbf1dd37e14a10afe6b53b6519fd600daead808e2c26a",
+    "firmware/esp32c3/ComputeWiFi.ino.partitions.bin": "148b959cbff1c38aa8e1d5c0ba9d612c54997b945e56a63f41223eef650653a1",
+    "firmware/esp32c3/ComputeWiFi.ino.partitions_flashed.bin": "148b959cbff1c38aa8e1d5c0ba9d612c54997b945e56a63f41223eef650653a1",
+    "firmware/esp32c3/ComputeWiFi.ino_flashed.bin": "930e60e8192fd190b09b361f6069039cf1486f74fb1e7ca68c00ca3c0ee2ca18",
+    "firmware/uno/ComputeWorker.ino.eep": "788e5ffc44ae4ee912fe01f495951f96b0accd5705e184dcaea197d8b64856a6",
+    "firmware/uno/ComputeWorker.ino.elf": "4eff20f357ac2cc8dccc7609604209ad381b357524993ae018b9444f583936f4",
+    "firmware/uno/ComputeWorker.ino.hex": "10b09be83ffbda15f2c3b201a68651876333b9e97589101e688e567ec4fdcf6d",
+    "firmware/uno/ComputeWorker.ino.with_bootloader.bin": "5dabfd131ad1e402cd3b4b9542b19d62a8151c4256502d6e2b581dedaec95419",
+    "firmware/uno/ComputeWorker.ino.with_bootloader.hex": "037cf9edfd6201a57710110fcab48963c62f39a2eac9fbc1570e552ae78aa09f"
+  },
+  "boards": {
+    "uno-01": {
+      "fqbn": "arduino:avr:uno",
+      "core": "1.8.8",
+      "flash_bytes": 7754,
+      "global_ram_bytes": 631,
+      "ram_remaining_bytes": 1417
+    },
+    "esp32c3-01": {
+      "fqbn": "esp32:esp32:esp32c3:FlashMode=dio,FlashFreq=40,FlashSize=8M",
+      "core": "3.3.12",
+      "flash_bytes": 965903,
+      "global_ram_bytes": 37068
+    }
+  },
+  "checks": {
+    "python_normal": {
+      "tests": 176,
+      "passed": true
+    },
+    "python_asan_ubsan": {
+      "tests": 176,
+      "passed": true
+    },
+    "firmware_ctest": {
+      "tests": 3,
+      "passed": true
+    },
+    "startup_after_legacy_options": {
+      "tests": 5,
+      "passed": true
+    },
+    "javascript_syntax": {
+      "passed": true
+    },
+    "both_firmware_compiled_uploaded": true
+  }
+}

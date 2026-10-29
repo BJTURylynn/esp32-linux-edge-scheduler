@@ -20,6 +20,7 @@ let pendingQuestion = null;
 let currentSource = 'example';
 let refreshing = false;
 let stateRequest = 0;
+let currentView = 'chat';
 
 function escapeHTML(text) { return String(text).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char])); }
 function inline(text) { return escapeHTML(text).replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>'); }
@@ -102,9 +103,15 @@ async function refresh(){
   finally{if(ticket===stateRequest){refreshing=false;renderState();}}
 }
 function showView(view){
-  const chat=view!=='evidence';$('chat-view').hidden=!chat;$('evidence-view').hidden=chat;
-  document.querySelectorAll('[data-view]').forEach(button=>{const selected=button.dataset.view===(chat?'chat':'evidence');button.classList.toggle('active',selected);if(selected)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');});
-  $('breadcrumb-current').textContent=chat?'运维对话':'调度证据';$('page-title').textContent=chat?'让调度数据，回答你的问题。':'每一个结论，都有数据可查。';$('page-description').textContent=chat?'结合设备任务记录与对照实验，理解系统表现和调度取舍。':'查看所选来源的文件记录，核对分组指标与结论范围。';
+  currentView=['chat','evidence','dispatch'].includes(view)?view:'chat';
+  history.replaceState(null,'','#'+currentView);
+  const chat=currentView==='chat',live=currentView==='dispatch';$('chat-view').hidden=!chat;$('evidence-view').hidden=currentView!=='evidence';$('dispatch-view').hidden=!live;$('analysis-overview').hidden=live;
+  document.querySelectorAll('[data-view]').forEach(button=>{const selected=button.dataset.view===currentView;button.classList.toggle('active',selected);if(selected)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');});
+  $('breadcrumb-current').textContent=live?'任务派发':chat?'运维对话':'调度证据';$('page-title').textContent=live?'把计算交给设备，把进度留在眼前。':chat?'让调度数据，回答你的问题。':'每一个结论，都有数据可查。';$('page-description').textContent=live?'Linux 中央排队，ESP32-C3 与 Uno 执行计算，结果回传后确认完成。':chat?'结合设备任务记录与对照实验，理解系统表现和调度取舍。':'查看所选来源的文件记录，核对分组指标与结论范围。';
+  $('refresh-button').innerHTML=icon('refresh')+(live?'刷新设备':'刷新证据');
+  $('workspace-note-title').textContent=live?'中央任务工作台':'只读实验空间';
+  $('workspace-note-text').innerHTML=live?'你提交任务，设备执行计算。<br>大模型仍只读。':'读取记录，解释结果。<br>调度仍由 Linux C 执行。';
+  if(live)dispatchView.start();else dispatchView.stop();
   closeSidebar();
 }
 function updateControls(){const blocked=busy||refreshing||!state||Boolean(state.evidence?.empty);$('question').disabled=blocked;$('answer-mode').disabled=busy||refreshing;$('new-chat').disabled=busy;$('send-button').disabled=blocked||!$('question').value.trim();$('refresh-button').disabled=busy||refreshing;$('model-settings').disabled=busy||refreshing||!state;$('model-key-state').disabled=busy||refreshing||!state;document.querySelectorAll('.suggestion').forEach(button=>button.disabled=blocked);document.querySelectorAll('[data-source]').forEach(button=>button.disabled=busy||refreshing);$('chat-form').setAttribute('aria-busy',String(busy));$('send-button').innerHTML=icon(busy?'clock':'arrow-up');}
@@ -151,7 +158,7 @@ document.querySelectorAll('.suggestion').forEach(button=>button.addEventListener
 document.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>showView(button.dataset.view)));
 $('new-chat').addEventListener('click',()=>{$('messages').replaceChildren();$('welcome').hidden=false;$('question').value='';resizeInput();pendingQuestion=null;setPageError('');$('question').focus();});
 document.querySelectorAll('[data-source]').forEach(button=>button.addEventListener('click',()=>{if(busy||refreshing||button.dataset.source===currentSource)return;currentSource=button.dataset.source;state=null;pendingQuestion=null;$('messages').replaceChildren();$('welcome').hidden=false;$('question').value='';resizeInput();refresh();}));
-$('refresh-button').addEventListener('click',refresh);
+$('refresh-button').addEventListener('click',()=>currentView==='dispatch'?dispatchView.refresh():refresh());
 $('view-evidence').addEventListener('click',()=>showView('evidence'));
 $('back-to-chat').addEventListener('click',()=>{showView('chat');$('question').focus();});
 $('model-settings').addEventListener('click',openSettings);$('model-key-state').addEventListener('click',openSettings);

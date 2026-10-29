@@ -1,0 +1,10 @@
+{
+  "device": "esp32c3-01",
+  "connections": 1,
+  "forwarded_device": 45,
+  "forwarded_central": 29,
+  "errors": 0,
+  "running": false,
+  "last_error": null,
+  "semantics": "forwarded messages are NOT proof of task completion"
+}

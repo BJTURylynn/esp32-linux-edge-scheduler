@@ -1,7 +1,7 @@
 """Local-only web workbench for the existing read-only operations assistant.
 
-No extra packages, file-editing tools, scheduler controls or browser-side key.
-Bind only to loopback. Model credentials live in this process, never in files.
+Model tools remain read-only. Explicit human task submission uses a separate
+fixed central-service client. Bind to loopback; model keys stay in memory.
 """
 import argparse
 import getpass
@@ -9,6 +9,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import os
 from pathlib import Path
+import re
 import secrets
 import threading
 import time
@@ -17,6 +18,7 @@ from urllib.parse import parse_qs, urlsplit
 from .agent import ReadOnlyAgent
 from .agent_live import BASE_URL, MODEL, ROOT, RecordingClient, _redact
 from .llm import ModelError, OpenAICompatibleClient
+from .dispatch_client import DispatchClient, DispatchError
 
 
 MAX_BODY = 16384
@@ -28,6 +30,8 @@ SOURCES = {
 }
 STATIC = {"/": ("index.html", "text/html; charset=utf-8"),
           "/styles.css": ("styles.css", "text/css; charset=utf-8"),
+          "/dispatch.js": ("dispatch.js", "text/javascript; charset=utf-8"),
+          "/dispatch.css": ("dispatch.css", "text/css; charset=utf-8"),
           "/app.js": ("app.js", "text/javascript; charset=utf-8")}
 
 
@@ -55,11 +59,14 @@ class SnapshotAgent(ReadOnlyAgent):
 
 class WebApp:
     def __init__(self, status_path, report_path, api_key=None, model=MODEL,
-                 base_url=BASE_URL, client_factory=OpenAICompatibleClient):
+                 base_url=BASE_URL, client_factory=OpenAICompatibleClient,
+                 dispatch_host="127.0.0.1", dispatch_port=9100,
+                 dispatch_client_factory=DispatchClient):
         self.status_path = Path(status_path)
         self.report_path = Path(report_path)
         self.model, self.base_url = model, base_url
         self.client_factory = client_factory
+        self.dispatch_client = dispatch_client_factory(host=dispatch_host, port=dispatch_port)
         self.csrf_token = secrets.token_urlsafe(32)
         self._key = None
         self._key_lock = threading.Lock()
@@ -95,6 +102,17 @@ class WebApp:
         else:
             raise ApiError(400, "配置仅接受模型密钥或清除操作。")
         return {"key_configured": self.key_configured, "model": self.model}
+
+    def dispatch_state(self):
+        result = self.dispatch_client.state()
+        return {**result, "available": True, "csrf_token": self.csrf_token}
+
+    @staticmethod
+    def dispatch_run(body):
+        run = body.get("run_id")
+        if not isinstance(run, str) or not re.fullmatch(r"[0-9a-f]{16}", run):
+            raise ApiError(400, "请刷新中央状态后再操作，任务必须绑定当前运行编号。")
+        return run
 
     def _source_paths(self, source):
         if not isinstance(source, str) or source not in SOURCES:
@@ -260,6 +278,10 @@ class Handler(BaseHTTPRequestHandler):
             path = urlsplit(self.path).path
             if path == "/api/health":
                 self._send(200, {"ok": True})
+            elif path == "/api/dispatch/state":
+                if urlsplit(self.path).query:
+                    raise ApiError(400, "中央服务地址由启动配置指定。")
+                self._send(200, self.server.app.dispatch_state())
             elif path == "/api/state":
                 query = parse_qs(urlsplit(self.path).query, keep_blank_values=True)
                 if set(query) - {"source"} or len(query.get("source", ["example"])) != 1:
@@ -275,6 +297,8 @@ class Handler(BaseHTTPRequestHandler):
                 raise ApiError(404, "未找到该资源。")
         except ApiError as exc:
             self._send(exc.status, {"error": str(exc)})
+        except DispatchError:
+            self._send(503, {"available": False, "error": "中央调度服务未连接，请启动第二版派发服务。"})
         except (OSError, ValueError):
             self._send(500, {"error": "本地证据暂不可用，请稍后刷新。"})
 
@@ -286,14 +310,29 @@ class Handler(BaseHTTPRequestHandler):
                 result = self.server.app.configure(body)
             elif path == "/api/chat":
                 result = self.server.app.chat(body)
+            elif path == "/api/dispatch/tasks":
+                self.server.app.dispatch_run(body)
+                result = self.server.app.dispatch_client.submit(body)
+            elif path.startswith("/api/dispatch/tasks/") and path.endswith("/retry"):
+                task_id = path[len("/api/dispatch/tasks/"):-len("/retry")]
+                if set(body) != {"run_id"} or not task_id.isascii() or not task_id.isdecimal() or not 1 <= len(task_id) <= 10:
+                    raise ApiError(400, "重试需要有效任务编号和当前运行编号。")
+                result = self.server.app.dispatch_client.retry(int(task_id), run_id=self.server.app.dispatch_run(body))
             else:
                 raise ApiError(404, "未找到该接口。")
             self._send(200, result)
         except ApiError as exc:
             self._send(exc.status, {"error": str(exc)})
+        except DispatchError as exc:
+            result = {"error": "中央服务未确认操作结果，请先刷新任务列表，勿重复提交。"}
+            if getattr(exc, "receipts", None):
+                result["receipts"] = exc.receipts
+            self._send(503, result)
+        except ValueError:
+            self._send(400, {"error": "任务参数无效，请核对数量、范围及字段。"})
         except ModelError:
             self._send(400, {"error": "模型配置无效，请检查本地配置。"})
-        except (OSError, ValueError, TypeError, KeyError):
+        except (OSError, TypeError, KeyError):
             self._send(500, {"error": "本次分析未能完成，请刷新证据后重试。"})
 
 
@@ -316,6 +355,8 @@ def main():
     parser.add_argument("--model", default=MODEL)
     parser.add_argument("--base-url", default=BASE_URL)
     parser.add_argument("--prompt-key", action="store_true")
+    parser.add_argument("--dispatch-host", default="127.0.0.1")
+    parser.add_argument("--dispatch-port", type=int, default=9100)
     args = parser.parse_args()
     if not 1 <= args.port <= 65535:
         parser.error("port must be 1..65535")
@@ -323,7 +364,8 @@ def main():
     if args.prompt_key and not key:
         key = getpass.getpass("Model API key (hidden): ")
     try:
-        app = WebApp(args.status, args.report, key, args.model, args.base_url)
+        app = WebApp(args.status, args.report, key, args.model, args.base_url,
+                     dispatch_host=args.dispatch_host, dispatch_port=args.dispatch_port)
         del key
         server = make_server(app, port=args.port)
     except (ModelError, ValueError, OSError) as exc:

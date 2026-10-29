@@ -1,0 +1,7 @@
+{"direction":"device","message":{"v":2,"type":"hello","device":"uno-01"},"monotonic_ns":38420515000000}
+{"direction":"central","message":{"v":2,"type":"welcome","session":"379b571aba58593b"},"monotonic_ns":38420515000000}
+{"direction":"central","message":{"v":2,"type":"task","session":"379b571aba58593b","id":29,"seed":55,"count":256,"window":16,"passes":1000},"monotonic_ns":38420546000000}
+{"direction":"device","message":{"v":2,"type":"accept","device":"uno-01","session":"379b571aba58593b","id":29},"monotonic_ns":38420562000000}
+{"direction":"device","message":{"v":2,"type":"result","device":"uno-01","session":"379b571aba58593b","id":29,"mean":-5.244141,"rms":49.127136,"compute_us":12771268},"monotonic_ns":38433343000000}
+{"direction":"central","message":{"v":2,"type":"ping","session":"379b571aba58593b"},"monotonic_ns":38433343000000}
+{"direction":"device","message":{"v":2,"type":"pong","device":"uno-01","session":"379b571aba58593b"},"monotonic_ns":38433359000000}
