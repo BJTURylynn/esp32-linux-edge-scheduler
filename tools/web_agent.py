@@ -12,7 +12,7 @@ from pathlib import Path
 import secrets
 import threading
 import time
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlsplit
 
 from .agent import ReadOnlyAgent
 from .agent_live import BASE_URL, MODEL, ROOT, RecordingClient, _redact
@@ -20,6 +20,12 @@ from .llm import ModelError, OpenAICompatibleClient
 
 
 MAX_BODY = 16384
+EXAMPLE_STATUS = ROOT / "docs/evidence/project-demo/service/status.json"
+EXAMPLE_REPORT = ROOT / "docs/evidence/dual-device-scheduler/comparison/report.json"
+SOURCES = {
+    "example": ("示例数据 · 作者历史结果", "来自项目作者已保存的实验记录，仅供演示，不代表本机已运行实验或设备当前在线。"),
+    "local": ("本机实验 · 文件快照", "只读取启动时配置的本机结果文件；刷新不会运行实验，文件快照不代表设备或服务当前在线。"),
+}
 STATIC = {"/": ("index.html", "text/html; charset=utf-8"),
           "/styles.css": ("styles.css", "text/css; charset=utf-8"),
           "/app.js": ("app.js", "text/javascript; charset=utf-8")}
@@ -29,6 +35,22 @@ class ApiError(ValueError):
     def __init__(self, status, message):
         self.status = status
         super().__init__(message)
+
+
+class SnapshotAgent(ReadOnlyAgent):
+    """Keep preflight and model tools on the same source observations."""
+    def __init__(self, status_path, report_path, source):
+        super().__init__(status_path, report_path)
+        self._snapshot = {}
+        self._origin = SOURCES[source][0]
+
+    def _evidence(self, tool):
+        if tool not in self._snapshot:
+            result = super()._evidence(tool)
+            if result["available"]:
+                result["data"]["evidence_origin"] = self._origin
+            self._snapshot[tool] = result
+        return self._snapshot[tool]
 
 
 class WebApp:
@@ -74,11 +96,19 @@ class WebApp:
             raise ApiError(400, "配置仅接受模型密钥或清除操作。")
         return {"key_configured": self.key_configured, "model": self.model}
 
-    def state(self):
-        agent = ReadOnlyAgent(self.status_path, self.report_path)
-        evidence = {"kind": "snapshot", "label": "历史实测快照"}
-        for field, tool, path in (("status", "query_status", self.status_path),
-                                  ("report", "read_report", self.report_path)):
+    def _source_paths(self, source):
+        if not isinstance(source, str) or source not in SOURCES:
+            raise ApiError(400, "请选择示例数据或本机实验。")
+        return ((EXAMPLE_STATUS, EXAMPLE_REPORT) if source == "example"
+                else (self.status_path, self.report_path))
+
+    def state(self, source="example"):
+        status_path, report_path = self._source_paths(source)
+        agent = ReadOnlyAgent(status_path, report_path)
+        evidence = {"kind": "snapshot", "source": source,
+                    "label": SOURCES[source][0], "description": SOURCES[source][1]}
+        for field, tool, path in (("status", "query_status", status_path),
+                                  ("report", "read_report", report_path)):
             value = agent._evidence(tool)
             record = {"available": value["available"]}
             if value["available"]:
@@ -88,19 +118,28 @@ class WebApp:
                 except OSError:
                     pass
             else:
-                record["reason"] = "配置的证据暂不可用。"
+                record["reason"] = "本机记录尚未生成或不可读取。" if source == "local" else "示例记录暂不可读取。"
             evidence[field] = record
+        available = sum(evidence[field]["available"] for field in ("status", "report"))
+        evidence.update(empty=available == 0, partial=available == 1)
         return {"model": self.model, "key_configured": self.key_configured,
-                "csrf_token": self.csrf_token, "evidence": evidence}
+                "source": source, "csrf_token": self.csrf_token, "evidence": evidence}
 
     def chat(self, body):
-        if not {"question"} <= set(body) <= {"question", "mode"}:
-            raise ApiError(400, "提问仅接受question和mode。")
+        if not {"question"} <= set(body) <= {"question", "mode", "source"}:
+            raise ApiError(400, "提问仅接受question、mode和source。")
         question, mode = body["question"], body.get("mode", "llm")
+        source = body.get("source", "example")
+        status_path, report_path = self._source_paths(source)
         if not isinstance(question, str) or not question.strip() or len(question) > 2000:
             raise ApiError(400, "请输入1至2000字的问题。")
         if mode not in ("llm", "rules"):
             raise ApiError(400, "请选择大模型或离线规则模式。")
+        agent = SnapshotAgent(status_path, report_path, source)
+        if not any([agent._evidence(tool)["available"]
+                    for tool in ("query_status", "read_report")]):
+            raise ApiError(409, "暂无实验记录，请先运行本机实验并配置结果文件。" if source == "local"
+                           else "示例记录暂不可读取，请检查项目文件。")
         with self._key_lock:
             key = self._key
         if mode == "llm" and not key:
@@ -114,7 +153,6 @@ class WebApp:
                 client = RecordingClient(self.client_factory(model=self.model,
                     base_url=self.base_url, api_key=key, timeout=60,
                     max_output_tokens=1600))
-            agent = ReadOnlyAgent(self.status_path, self.report_path)
             result = agent.ask(question.strip(), client=client, max_turns=5)
             trace = client.trace if client else []
             allowed = any(item.get("available") is True
@@ -136,9 +174,11 @@ class WebApp:
             # Fixed paths are operator configuration. Strip them from UI text;
             # the model already receives only the filtered numerical packet.
             for field in ("answer", "evidence_text"):
-                for path in (self.status_path, self.report_path):
+                for path in (status_path, report_path):
                     result[field] = result[field].replace(str(path), "已配置的实验记录")
+            result["evidence_text"] = SOURCES[source][0] + "\n" + result["evidence_text"]
             result.update(success=(mode == "rules" and result["mode"] == "rules") or valid_llm,
+                          source=source, source_label=SOURCES[source][0],
                           api_trace=trace, elapsed_seconds=round(time.monotonic()-started, 3))
             return _redact(result, key)
         finally:
@@ -221,7 +261,10 @@ class Handler(BaseHTTPRequestHandler):
             if path == "/api/health":
                 self._send(200, {"ok": True})
             elif path == "/api/state":
-                self._send(200, self.server.app.state())
+                query = parse_qs(urlsplit(self.path).query, keep_blank_values=True)
+                if set(query) - {"source"} or len(query.get("source", ["example"])) != 1:
+                    raise ApiError(400, "数据入口参数无效。")
+                self._send(200, self.server.app.state(query.get("source", ["example"])[0]))
             elif path in STATIC:
                 name, content_type = STATIC[path]
                 file = ROOT / "web" / name
@@ -266,8 +309,10 @@ def make_server(app, host="127.0.0.1", port=8765):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--port", type=int, default=8765)
-    parser.add_argument("--status", type=Path, default=ROOT / "docs/evidence/project-demo/service/status.json")
-    parser.add_argument("--report", type=Path, default=ROOT / "docs/evidence/dual-device-scheduler/comparison/report.json")
+    parser.add_argument("--status", type=Path, default=ROOT / "results/live/status.json",
+                        help="local experiment status (never used by the example entry)")
+    parser.add_argument("--report", type=Path, default=ROOT / "results/comparison/report.json",
+                        help="local comparison report (never used by the example entry)")
     parser.add_argument("--model", default=MODEL)
     parser.add_argument("--base-url", default=BASE_URL)
     parser.add_argument("--prompt-key", action="store_true")
@@ -284,7 +329,7 @@ def main():
     except (ModelError, ValueError, OSError) as exc:
         parser.error(str(exc))
     print(f"EdgeScope: http://127.0.0.1:{server.server_port}", flush=True)
-    print("Historical experiment snapshots; model key stays in server memory.", flush=True)
+    print("Separate example/local snapshots; model key stays in server memory.", flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

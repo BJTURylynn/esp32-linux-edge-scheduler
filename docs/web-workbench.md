@@ -17,10 +17,11 @@ Set-Location D:\Projects\esp32-linux-edge-scheduler
 
 ## 提问与核对
 
-1. 在“模型设置”输入 API Key。默认模型为 `coding-glm-5.3-flash-free`，请求发送到 AIHubMix 的 `https://aihubmix.com/v1`。
-2. 点击推荐问题，或输入自己的问题，例如“为什么紧急任务等待下降，普通任务却稍有延后？”
-3. 阅读回答下方的实际执行记录，核对 `query_status`、`read_report` 是否取得证据，以及模型请求次数、耗时和返回的 token 用量。
-4. 展开程序证据摘要，或切换“调度证据”查看完成量、拒绝量、等待均值、等待 P95 和完成时间 P95。
+1. 先选择“示例数据”或“本机实验”。没有本机记录时，先用示例了解页面；两个入口的聊天与统计不会混用。
+2. 在“模型设置”输入 API Key。默认模型为 `coding-glm-5.3-flash-free`，请求发送到 AIHubMix 的 `https://aihubmix.com/v1`。
+3. 点击推荐问题，或输入自己的问题，例如“为什么紧急任务等待下降，普通任务却稍有延后？”
+4. 阅读回答下方的数据来源与实际执行记录，核对 `query_status`、`read_report` 是否取得证据，以及模型请求次数、耗时和返回的 token 用量。
+5. 展开程序证据摘要，或切换“调度证据”查看完成量、拒绝量、等待均值、等待 P95 和完成时间 P95。
 
 每条问题独立读取证据并调用模型。页面会保留当前会话里的消息供阅读，但不会把之前的对话作为下一条问题的模型上下文；追问时请写清对象。“新对话”清空当前页面消息。聊天不会自动写入文件，刷新页面后也不会恢复。
 
@@ -42,12 +43,16 @@ Set-Location D:\Projects\esp32-linux-edge-scheduler
 
 页面只允许设置或清除 Key，模型名与接口地址由启动程序配置。需要更换兼容接口时，由操作者在命令行明确指定 `--model`、`--base-url`，不能通过聊天或页面请求让模型选择任意地址。
 
-## 默认数据是历史快照
+## 示例数据与本机实验
 
-默认读取：
+首次打开默认选择“示例数据”，标注“作者历史结果”，读取：
 
 - `docs/evidence/project-demo/service/status.json`：双设备实物演示结束后的状态记录。
 - `docs/evidence/dual-device-scheduler/comparison/report.json`：同一组样本公平回放的策略对照统计。
+
+“本机实验”单独读取启动时的 `--status` 和 `--report`，默认分别是项目目录的 `results/live/status.json`、`results/comparison/report.json`。这两个默认目录不会随 Git 仓库分发。没有记录时，页面显示“暂无实验记录”，指标为 `—`，不显示虚构的零，不调用模型，也不回退到作者的示例数据。只有状态或只有报告时，仅显示有效部分，并提示记录不完整。
+
+切换入口会清空当前页面对话和输入，避免把示例答案当成本机结论；分析期间不能切换。每次状态读取和聊天请求都携带明确的数据来源，后端按请求选择固定文件，不改变其他页面的入口。模型工具收到的数据也带有所选来源标记。
 
 页面“本地后端已连接”只说明网页后端可访问；完成 40 个任务、队列为 0 或记录已结束，都不是当前设备在线证明。刷新证据重新读取固定文件，不会启动 Linux 服务、采集新数据或重新进行对照实验。两个来源的完成量和 P95 也不能混作同一轮运行。
 
@@ -59,10 +64,10 @@ Set-Location D:\Projects\esp32-linux-edge-scheduler
 & 'D:\Codex\esp32-linux-edge-scheduler\tools\device-venv\Scripts\python.exe' -m tools.web_agent --status 'D:\Codex\esp32-linux-edge-scheduler\outputs\my-project-demo\service\status.json' --report 'D:\Codex\esp32-linux-edge-scheduler\outputs\my-comparison\report.json'
 ```
 
-请按实际产物路径调整，文件不存在时页面明确显示证据不可用。即使指定持续更新的文件，读取的仍是文件快照，不替代进程存活或设备连通性检查。浏览器和模型都不能自行指定主机上的其他文件。
+请先用项目原有命令完成本机演示或对照实验，再按实际产物路径启动工作台，最后点击“本机实验”和“刷新证据”。这些参数只影响本机入口，不会替换示例入口；不会自动查找或猜测哪个目录是最新实验。文件不存在或格式无效时对应记录不可用。即使指定持续更新的文件，读取的仍是文件快照，不替代进程存活或设备连通性检查。浏览器和模型都不能自行指定主机上的其他文件。
 
 ## 接口与测试
 
 后端入口为 `tools/web_agent.py`，页面资源为 `web/index.html`、`web/styles.css` 和 `web/app.js`。接口包括状态读取、聊天和内存密钥配置；只提供固定资源路径。写入请求验证本机 Host、Origin 和页面凭证，并限制 JSON 大小与问题长度。
 
-`tests/test_web_agent.py` 使用真实本机 HTTP 服务与模拟模型验证接口，不在自动测试中请求外部模型。网页 15 项接口测试及完整 124 项 Python 回归通过；另通过页面完成真实模型问答、规则模式和窄屏导航验证，见[网页验收记录](evidence/web-workbench/README.md)。
+`tests/test_web_agent.py` 使用真实本机 HTTP 服务与模拟模型验证接口，不在自动测试中请求外部模型。131 项完整 Python 回归通过（网页 22 项）。首次网页验收见[网页验收记录](evidence/web-workbench/README.md)；新增[双入口验收](evidence/web-workbench/sources.md)单独记录，旧截图保留为当时版本的历史证据。

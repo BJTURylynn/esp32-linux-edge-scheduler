@@ -41,7 +41,16 @@
           <button class="secondary-button" id="refresh-button"><span data-icon="refresh"></span>刷新证据</button>
         </section>
 
-        <div class="snapshot-banner"><span data-icon="clock"></span><span><strong id="snapshot-label">历史实测快照</strong><span class="banner-divider">·</span>以下数据来自已保存的实验记录，不代表设备或服务当前在线。</span></div>
+        <section class="source-workspace" aria-label="选择数据来源">
+          <div class="source-options" role="group" aria-label="数据来源">
+            <button type="button" class="source-option active" data-source="example" aria-pressed="true"><span data-icon="book"></span><span><strong>示例数据</strong><small>项目作者的历史结果</small></span></button>
+            <button type="button" class="source-option" data-source="local" aria-pressed="false"><span data-icon="cpu"></span><span><strong>本机实验</strong><small>读取自己的实验记录</small></span></button>
+          </div>
+          <p id="source-hint">示例数据用于了解项目，不是你这台电脑的测试结果。</p>
+        </section>
+        <div class="snapshot-banner"><span data-icon="clock"></span><span><strong id="snapshot-label">示例数据 · 作者历史结果</strong><span class="banner-divider">·</span><span id="snapshot-description">以下为已保存的实验快照，不代表设备或服务当前在线。</span></span></div>
+        <section id="empty-state" class="empty-state" aria-live="polite" hidden><span data-icon="files"></span><div><h2 id="empty-title">暂无实验记录</h2><p id="empty-description">先运行本机实验，再在启动工作台时用 --status 和 --report 指定自己的结果文件。刷新证据不会启动实验。</p></div></section>
+        <div id="partial-state" class="partial-state" role="status" hidden>仅取得部分实验记录。缺失指标显示为 —，不会补用示例数据。</div>
         <div class="page-error" id="page-error" role="alert" hidden></div>
 
         <section class="stats-grid" aria-label="实验数据概览">
@@ -94,7 +103,7 @@
         </section>
 
         <section class="full-evidence" id="evidence-view" hidden>
-          <div class="evidence-view-heading"><div><h2>调度证据，而非实时遥测</h2><p>以下分组统计来自当前配置的对照报告；两种策略的配置可比性由报告记录。</p></div><span class="soft-badge" id="comparison-status">等待读取</span></div>
+          <div class="evidence-view-heading"><div><h2 id="evidence-title">示例数据的调度证据</h2><p id="evidence-description">以下分组统计来自作者保存的对照报告，不是本机实验结果。</p></div><span class="soft-badge" id="comparison-status">等待读取</span></div>
           <div class="table-wrap"><table><thead><tr><th>调度策略</th><th>任务类型</th><th>完成</th><th>拒绝</th><th>平均等待 / ms</th><th>等待 P95 / ms</th><th>完成 P95 / ms</th></tr></thead><tbody id="metrics-table"><tr><td colspan="7">正在读取实验报告…</td></tr></tbody></table></div>
           <div class="evidence-notes"><div><span data-icon="shield"></span><h3>保留结论的边界</h3><p>实验样本为合成数据。等待时间变化不直接证明吞吐提高，状态文件也不能证明设备或进程当前在线。</p></div><div><span data-icon="layers"></span><h3>选择下一个任务</h3><p>priority 优先选取队列中的紧急任务，不打断正在执行的计算；普通任务可能因此等待更久。</p></div></div>
           <button class="secondary-button" id="back-to-chat"><span data-icon="chat"></span>回到对话，询问这些数据</button>

@@ -17,6 +17,9 @@ const $ = id => document.getElementById(id);
 let state = null;
 let busy = false;
 let pendingQuestion = null;
+let currentSource = 'example';
+let refreshing = false;
+let stateRequest = 0;
 
 function escapeHTML(text) { return String(text).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char])); }
 function inline(text) { return escapeHTML(text).replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>'); }
@@ -62,7 +65,17 @@ function setPageError(message){$('page-error').hidden=!message;$('page-error').t
 function renderState(){
   const status=state?.evidence?.status,report=state?.evidence?.report;
   const s=status?.available?status.data:null,r=report?.available?report.data:null;
-  $('snapshot-label').textContent=state?.evidence?.label||'历史实测快照';
+  const local=currentSource==='local';
+  document.querySelectorAll('[data-source]').forEach(button=>{const active=button.dataset.source===currentSource;button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active));button.disabled=busy||refreshing;});
+  $('snapshot-label').textContent=state?.evidence?.label||(local?'本机实验 · 文件快照':'示例数据 · 作者历史结果');
+  $('snapshot-description').textContent=state?.evidence?.description||(local?'只读取本机配置的结果文件，不代表设备或服务当前在线。':'项目作者保存的历史结果，不是你这台电脑的测试结果。');
+  $('source-hint').textContent=local?'先运行自己的实验，再用启动参数 --status 和 --report 指定结果文件；刷新不会运行实验。':'示例数据用于了解项目，不是你这台电脑的测试结果。';
+  const empty=Boolean(state?.evidence?.empty);
+  $('empty-state').hidden=!empty;$('partial-state').hidden=!state?.evidence?.partial;
+  $('empty-title').textContent=local?'暂无实验记录':'示例记录暂不可用';
+  $('empty-description').textContent=local?'先运行本机实验，再在启动工作台时用 --status 和 --report 指定自己的结果文件。刷新证据不会启动实验，也不会补用作者的示例数据。':'请检查项目自带的示例记录是否完整，再刷新证据。';
+  $('evidence-title').textContent=local?'本机实验的调度证据':'示例数据的调度证据';
+  $('evidence-description').textContent=local?'只展示启动时配置的本机对照报告；文件快照不替代设备或进程在线检查。':'以下分组统计来自作者保存的对照报告，不是本机实验结果。';
   $('completed-value').textContent=count(s?.completed);$('rejected-value').textContent=count(s?.rejected);
   $('urgent-value').textContent=number(metric(r,'priority','urgent'));$('normal-value').textContent=number(metric(r,'priority','normal'));
   $('completed-note').textContent=s?`状态记录 · 已接收 ${count(s.accepted)} 个`:'状态记录暂不可读';
@@ -77,28 +90,32 @@ function renderState(){
   $('model-key-state').textContent=state?.key_configured?'密钥已在后端配置 · 点击管理':'尚未配置密钥 · 点击连接';
   $('comparison-status').textContent=r?(r.comparable_configuration?'报告标记：配置可比':'报告标记：配置不可比'):'报告不可读取';
   const body=$('metrics-table');body.replaceChildren();
-  if(!r){const row=body.insertRow();const cell=row.insertCell();cell.colSpan=7;cell.textContent='报告暂不可读，请检查后端固定的证据文件。';}
+  if(!r){const row=body.insertRow();const cell=row.insertCell();cell.colSpan=7;cell.textContent=refreshing?'正在读取所选来源的实验记录…':local?'暂无本机对照报告，请运行实验并配置 --report。':'示例报告暂不可读，请检查项目自带的证据文件。';}
   else for(const policy of ['fifo','priority'])for(const kind of ['urgent','normal']){const row=body.insertRow();const m=r.pooled?.[policy]?.[kind];const vals=[policy==='fifo'?'FIFO':'priority',kind==='urgent'?'紧急任务':'普通任务',count(m?.completed),count(m?.rejected),number(m?.wait_ms?.mean,3),number(m?.wait_ms?.p95,3),number(m?.total_ms?.p95,3)];vals.forEach((value,i)=>{const cell=row.insertCell();cell.textContent=value;if(i===5&&policy==='priority')cell.className='emphasis';});}
+  updateControls();
 }
 async function refresh(){
-  const button=$('refresh-button');button.disabled=true;
-  try{state=await request('/api/state');renderState();setPageError('');$('backend-state').className='local-indicator ready';$('backend-state').innerHTML='<span class="tiny-dot"></span>本地后端已连接';}
-  catch(error){setPageError(error.message);$('backend-state').className='local-indicator error';$('backend-state').innerHTML='<span class="tiny-dot"></span>本地服务未连接';}
-  finally{button.disabled=false;}
+  const selected=currentSource,ticket=++stateRequest;
+  refreshing=true;state=null;renderState();setPageError('');
+  try{const data=await request(`/api/state?source=${selected}`);if(ticket!==stateRequest||selected!==currentSource)return;if(data.source!==selected||data.evidence?.source!==selected)throw new Error('证据来源未匹配，请刷新后重试。');state=data;renderState();$('backend-state').className='local-indicator ready';$('backend-state').innerHTML='<span class="tiny-dot"></span>本地后端已连接';}
+  catch(error){if(ticket!==stateRequest)return;state=null;renderState();setPageError(error.message);$('backend-state').className='local-indicator error';$('backend-state').innerHTML='<span class="tiny-dot"></span>本地服务未连接';}
+  finally{if(ticket===stateRequest){refreshing=false;renderState();}}
 }
 function showView(view){
   const chat=view!=='evidence';$('chat-view').hidden=!chat;$('evidence-view').hidden=chat;
   document.querySelectorAll('[data-view]').forEach(button=>{const selected=button.dataset.view===(chat?'chat':'evidence');button.classList.toggle('active',selected);if(selected)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');});
-  $('breadcrumb-current').textContent=chat?'运维对话':'调度证据';$('page-title').textContent=chat?'让调度数据，回答你的问题。':'每一个结论，都有数据可查。';$('page-description').textContent=chat?'结合设备任务记录与对照实验，理解系统表现和调度取舍。':'查看当前配置的历史实验记录，核对分组指标与结论范围。';
+  $('breadcrumb-current').textContent=chat?'运维对话':'调度证据';$('page-title').textContent=chat?'让调度数据，回答你的问题。':'每一个结论，都有数据可查。';$('page-description').textContent=chat?'结合设备任务记录与对照实验，理解系统表现和调度取舍。':'查看所选来源的文件记录，核对分组指标与结论范围。';
   closeSidebar();
 }
-function setBusy(value){busy=value;$('question').disabled=value;$('answer-mode').disabled=value;$('new-chat').disabled=value;$('send-button').disabled=value||!$('question').value.trim();document.querySelectorAll('.suggestion').forEach(button=>button.disabled=value);$('chat-form').setAttribute('aria-busy',String(value));$('send-button').innerHTML=icon(value?'clock':'arrow-up');}
+function updateControls(){const blocked=busy||refreshing||!state||Boolean(state.evidence?.empty);$('question').disabled=blocked;$('answer-mode').disabled=busy||refreshing;$('new-chat').disabled=busy;$('send-button').disabled=blocked||!$('question').value.trim();$('refresh-button').disabled=busy||refreshing;$('model-settings').disabled=busy||refreshing||!state;$('model-key-state').disabled=busy||refreshing||!state;document.querySelectorAll('.suggestion').forEach(button=>button.disabled=blocked);document.querySelectorAll('[data-source]').forEach(button=>button.disabled=busy||refreshing);$('chat-form').setAttribute('aria-busy',String(busy));$('send-button').innerHTML=icon(busy?'clock':'arrow-up');}
+function setBusy(value){busy=value;updateControls();}
 function scrollChat(){$('chat-scroll').scrollTop=$('chat-scroll').scrollHeight;}
 function userMessage(text){const row=document.createElement('div');row.className='message message-user';const bubble=document.createElement('div');bubble.className='user-bubble';bubble.textContent=text;row.append(bubble);$('messages').append(row);}
 function assistantSkeleton(){const row=document.createElement('div');row.className='message assistant-message';row.innerHTML=`<div class="assistant-avatar">${icon('spark')}</div><div class="assistant-content"></div>`;$('messages').append(row);return row.querySelector('.assistant-content');}
 function renderAnswer(container,data){
   const mode=data.mode||'fallback';const label=mode==='llm'?'大模型回答':mode==='rules'?'离线规则':'失败回退 · 规则解释';
   container.innerHTML=`<div class="message-meta"><strong>EdgeScope</strong><span class="mode-badge ${mode==='llm'?'':mode==='rules'?'rules':'fallback'}">${label}</span></div>`;
+  const source=document.createElement('span');source.className='source-badge';source.textContent=data.source_label||(data.source==='local'?'本机实验':'示例数据');container.querySelector('.message-meta').append(source);
   if(data.reason){const reason=document.createElement('div');reason.className='fallback-reason';reason.textContent='模型未完成正常回答：'+data.reason;container.append(reason);}
   const answer=document.createElement('div');answer.className='answer-body';answer.innerHTML=markdown(data.answer||'没有可展示的回答，请核对证据与服务配置。');container.append(answer);
   const receipt=document.createElement('div');receipt.className='tool-receipt';receipt.innerHTML=`<div class="receipt-heading">${icon('shield')}<span>本次实际执行记录</span></div>`;
@@ -113,15 +130,17 @@ function renderAnswer(container,data){
   if(data.evidence_text){const evidence=document.createElement('details');evidence.className='program-evidence';const summary=document.createElement('summary');summary.textContent='展开程序提供的证据摘要';const content=document.createElement('pre');content.textContent=data.evidence_text;evidence.append(summary,content);container.append(evidence);}
 }
 async function submitQuestion(text){
-  if(busy)return;text=String(text||'').trim();if(!text)return;if(text.length>2000){setPageError('问题请控制在2000字以内。');return;}
+  if(busy||refreshing)return;text=String(text||'').trim();if(!text)return;if(text.length>2000){setPageError('问题请控制在2000字以内。');return;}
   if(!state){setPageError('请先连接本地服务并刷新证据。');return;}
+  if(state.evidence?.empty){setPageError(currentSource==='local'?'暂无实验记录，请先运行本机实验并配置结果文件。':'示例记录不可用，请检查项目文件。');return;}
   if($('answer-mode').value==='llm'&&!state.key_configured){pendingQuestion=text;openSettings();return;}
   showView('chat');$('welcome').hidden=true;userMessage(text);$('question').value='';resizeInput();const content=assistantSkeleton();content.innerHTML='<div class="loading-message"><span class="spinner"></span><span>正在请求回答并核对证据，请稍候…</span></div>';setBusy(true);setPageError('');scrollChat();
-  try{const data=await request('/api/chat',{question:text,mode:$('answer-mode').value});if(typeof data.answer!=='string')throw new Error(errorText(data,'没有取得有效回答，请稍后重试。'));renderAnswer(content,data);}
+  const selected=currentSource;
+  try{const data=await request('/api/chat',{question:text,mode:$('answer-mode').value,source:selected});if(data.source!==selected)throw new Error('回答来源未匹配，本次回答未展示，请刷新后重试。');if(typeof data.answer!=='string')throw new Error(errorText(data,'没有取得有效回答，请稍后重试。'));renderAnswer(content,data);}
   catch(error){content.replaceChildren();const node=document.createElement('div');node.className='message-error';node.textContent=error.message;content.append(node);}
   finally{setBusy(false);scrollChat();$('question').focus();}
 }
-function resizeInput(){const input=$('question');input.style.height='auto';input.style.height=Math.min(145,Math.max(45,input.scrollHeight))+'px';$('char-count').textContent=`${input.value.length} / 2000`;$('send-button').disabled=busy||!input.value.trim();}
+function resizeInput(){const input=$('question');input.style.height='auto';input.style.height=Math.min(145,Math.max(45,input.scrollHeight))+'px';$('char-count').textContent=`${input.value.length} / 2000`;updateControls();}
 function openSettings(){$('settings-status').textContent=state?.key_configured?'后端已有密钥。填写下方输入框可替换；留空不会读取已有值。':'输入密钥后即可使用大模型解读，也可直接选择离线规则模式。';$('api-key').value='';$('settings-dialog').showModal();}
 function closeSidebar(){$('sidebar').classList.remove('open');$('sidebar-scrim').hidden=true;}
 
@@ -131,6 +150,7 @@ $('question').addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.
 document.querySelectorAll('.suggestion').forEach(button=>button.addEventListener('click',()=>submitQuestion(button.dataset.question)));
 document.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>showView(button.dataset.view)));
 $('new-chat').addEventListener('click',()=>{$('messages').replaceChildren();$('welcome').hidden=false;$('question').value='';resizeInput();pendingQuestion=null;setPageError('');$('question').focus();});
+document.querySelectorAll('[data-source]').forEach(button=>button.addEventListener('click',()=>{if(busy||refreshing||button.dataset.source===currentSource)return;currentSource=button.dataset.source;state=null;pendingQuestion=null;$('messages').replaceChildren();$('welcome').hidden=false;$('question').value='';resizeInput();refresh();}));
 $('refresh-button').addEventListener('click',refresh);
 $('view-evidence').addEventListener('click',()=>showView('evidence'));
 $('back-to-chat').addEventListener('click',()=>{showView('chat');$('question').focus();});
