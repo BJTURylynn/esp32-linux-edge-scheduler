@@ -31,6 +31,7 @@ python -m tools.project_demo --esp-host <ESP32实际IPv4> --uno-port COM10 --out
 | `firmware/main/` | 原 ESP-IDF 设备端，作为可选实现保留 |
 | `firmware/esp32c3-arduino/` | ESP32-C3 Arduino Wi-Fi TCP 设备端，已实物烧录 |
 | `tools/` | 串口桥接（可选 pyserial 依赖），以及标准库回放、实验、统计、只读查询 |
+| `web/` | EdgeScope 本地聊天工作台、历史证据概览和分组指标 |
 | `tests/` | Python 单测与真实服务黑盒集成测试 |
 | `scripts/vmware*`、`deploy/vmware/` | 独立 Ubuntu VMware 环境的创建与连接 |
 | `.local/vmware/` | 本机镜像、虚拟磁盘和私钥，全部忽略提交 |
@@ -109,6 +110,10 @@ ESP32-C3与Arduino已同时接入同一Linux队列：实物40任务全部完成�
 ## 真实大模型只读解释
 
 已接入用户选择的 `coding-glm-5.3-flash-free` 并完成真实两轮工具调用验证：模型读取 `query_status`、`read_report` 后解释实验数字，两次HTTP200、最终stop，未回退。入口 `python -m tools.agent_live --output <新目录>` 会隐藏输入Key；配置、输出完整性检查与实测证据见 [真实模型接入](docs/live-model.md)。模型仍只解释证据，不控制实时调度。
+
+### 本地网页工作台
+
+在项目根目录运行 `python -m tools.web_agent`，打开 <http://127.0.0.1:8765>。EdgeScope 提供聊天、真实工具执行记录、FIFO/priority 指标和离线规则模式；Key 仅保存在本地后端进程内存中。默认展示历史实验快照，每条问题独立分析，不代表设备当前在线。无需新增依赖，启动与数据路径配置见 [网页工作台说明](docs/web-workbench.md)。
 
 ## 只读助手与范围
 
