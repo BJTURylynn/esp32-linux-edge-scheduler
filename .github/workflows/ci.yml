@@ -33,3 +33,16 @@ jobs:
       - run: arduino-cli core update-index
       - run: arduino-cli core install arduino:avr@1.8.8
       - run: arduino-cli compile --fqbn arduino:avr:uno firmware/coloreasyduino/EdgeDevice
+  esp32c3-arduino:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/setup-arduino-cli@v2
+        with:
+          version: '1.5.1'
+      - name: Install pinned official ESP32 Arduino core
+        run: |
+          arduino-cli core update-index --additional-urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
+          arduino-cli core install esp32:esp32@3.3.12 --additional-urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
+      - name: Compile the tested ESP32-C3 DIO firmware
+        run: arduino-cli compile --fqbn esp32:esp32:esp32c3:FlashMode=dio,FlashFreq=40,FlashSize=8M firmware/esp32c3-arduino/EdgeWiFi

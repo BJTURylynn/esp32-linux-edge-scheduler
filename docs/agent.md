@@ -50,7 +50,7 @@ python -m tools.agent ask "解释两种策略的差异" --backend llm --report r
 
 base URL 末尾可以是 `/v1` 等服务前缀，程序追加 `/chat/completions`。远程地址必须是 HTTPS；仅本机 `localhost`、`127.0.0.1` 和 `::1` 允许 HTTP，便于测试本地兼容服务。客户端拒绝重定向，避免把授权头转发到另一地址。
 
-请求使用 `model`、`messages`、`tools`、`tool_choice=auto`、`parallel_tool_calls=false` 和 `max_tokens=800`。部分供应商或模型不支持其中某些字段，需要选择与此接口兼容的模型；HTTP 错误会显示状态码并回退，不会反复重试。没有为某个供应商默认指定付费模型。
+请求使用 `model`、`messages`、`tools`、`tool_choice=auto`、`parallel_tool_calls=false` 和默认 `max_tokens=800`。可用 `--max-output-tokens 64..4096` 设置有界输出预算；`length`或`content_filter`结束会被拒绝并回退，避免接受不完整答案。部分供应商或模型不支持其中某些字段，需要选择与此接口兼容的模型；HTTP 错误会显示状态码并回退，不会反复重试。没有为某个供应商默认指定付费模型。
 
 ## 工具与执行边界
 
@@ -74,6 +74,10 @@ base URL 末尾可以是 `/v1` 等服务前缀，程序追加 `/chat/completions
 默认最多 **5 次模型请求**，可用 `--max-turns 1..10` 调整。每个模型响应最多处理两个工具调用。每次 HTTP 操作默认超时 20 秒，`--timeout` 允许 0.1 到 120 秒；响应最多读取 256 KiB。没有自动重试，因此 403 不会被误当作“没有 Action”而循环请求。
 
 模型生成的解释不能被当作已验证事实。程序摘要才是已记录数据的直接展示；仍需留意实验配置、拒绝量和每次运行的波动。状态文件不等于进程存活探测，合成数据也不等于板上验收。此版本不保证模型不会产生错误解释，也不接管实时调度。
+
+## 已完成的真实模型接入
+
+已用 `coding-glm-5.3-flash-free` 完成两轮HTTP200、两只读工具、正常stop结束的真实验证。新入口 `python -m tools.agent_live --output <新目录>` 默认隐藏输入Key，并保存脱敏实测结果；使用方法见 [真实模型接入](live-model.md)。普通入口仍默认rules。
 
 ## 验证
 

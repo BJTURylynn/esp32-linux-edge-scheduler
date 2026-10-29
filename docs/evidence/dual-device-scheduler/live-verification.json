@@ -1,0 +1,16 @@
+{
+  "verified": true,
+  "completed": 40,
+  "rejected": 0,
+  "devices": {
+    "uno-01": 20,
+    "esp32c3-01": 20
+  },
+  "priority": {
+    "normal": 32,
+    "urgent": 8
+  },
+  "max_absolute_numeric_error": 0.0,
+  "window": 8,
+  "passes": 1000000
+}

@@ -1,0 +1,498 @@
+{
+  "success": true,
+  "policy": "priority",
+  "passes": 1000000,
+  "requested_each": 20,
+  "port": 50071,
+  "error": null,
+  "verification": {
+    "verified": true,
+    "completed": 40,
+    "rejected": 0,
+    "devices": {
+      "uno-01": 20,
+      "esp32c3-01": 20
+    },
+    "priority": {
+      "normal": 32,
+      "urgent": 8
+    },
+    "max_absolute_numeric_error": 0.0,
+    "window": 8,
+    "passes": 1000000
+  },
+  "audit": {
+    "policy": "priority",
+    "completed_tasks": 40,
+    "audited_dispatches": 39,
+    "first_dispatch_not_audited": true,
+    "urgent_overtake_decisions": 8,
+    "urgent_overtake_pairs": 68,
+    "normal_with_waiting_urgent_decisions": 0,
+    "normal_with_waiting_urgent_pairs": 0,
+    "priority_violation_decisions": 0,
+    "priority_violation_pairs": 0,
+    "nonpreemptive_overlap_count": 0,
+    "same_priority_fifo": {
+      "normal": true,
+      "urgent": true
+    },
+    "fifo_dispatch_order": false,
+    "sample_limit": 20,
+    "samples": {
+      "urgent_overtakes": [
+        {
+          "selected": {
+            "task_id": 5,
+            "device_id": "esp32c3-01",
+            "seq": 44,
+            "priority": "urgent",
+            "enqueued_ns": 4785890807,
+            "started_ns": 5076837204,
+            "finished_ns": 5099477349
+          },
+          "waiting": {
+            "task_id": 3,
+            "device_id": "esp32c3-01",
+            "seq": 42,
+            "priority": "normal",
+            "enqueued_ns": 4782060551,
+            "started_ns": 5099885743,
+            "finished_ns": 5455772057
+          },
+          "safe_boundary_ns": 5076438780
+        },
+        {
+          "selected": {
+            "task_id": 5,
+            "device_id": "esp32c3-01",
+            "seq": 44,
+            "priority": "urgent",
+            "enqueued_ns": 4785890807,
+            "started_ns": 5076837204,
+            "finished_ns": 5099477349
+          },
+          "waiting": {
+            "task_id": 4,
+            "device_id": "esp32c3-01",
+            "seq": 43,
+            "priority": "normal",
+            "enqueued_ns": 4785632489,
+            "started_ns": 5478275896,
+            "finished_ns": 5835726481
+          },
+          "safe_boundary_ns": 5076438780
+        },
+        {
+          "selected": {
+            "task_id": 10,
+            "device_id": "esp32c3-01",
+            "seq": 49,
+            "priority": "urgent",
+            "enqueued_ns": 5240123272,
+            "started_ns": 5456181610,
+            "finished_ns": 5477894358
+          },
+          "waiting": {
+            "task_id": 4,
+            "device_id": "esp32c3-01",
+            "seq": 43,
+            "priority": "normal",
+            "enqueued_ns": 4785632489,
+            "started_ns": 5478275896,
+            "finished_ns": 5835726481
+          },
+          "safe_boundary_ns": 5455772057
+        },
+        {
+          "selected": {
+            "task_id": 10,
+            "device_id": "esp32c3-01",
+            "seq": 49,
+            "priority": "urgent",
+            "enqueued_ns": 5240123272,
+            "started_ns": 5456181610,
+            "finished_ns": 5477894358
+          },
+          "waiting": {
+            "task_id": 6,
+            "device_id": "esp32c3-01",
+            "seq": 45,
+            "priority": "normal",
+            "enqueued_ns": 4800303382,
+            "started_ns": 5859069742,
+            "finished_ns": 6219712838
+          },
+          "safe_boundary_ns": 5455772057
+        },
+        {
+          "selected": {
+            "task_id": 10,
+            "device_id": "esp32c3-01",
+            "seq": 49,
+            "priority": "urgent",
+            "enqueued_ns": 5240123272,
+            "started_ns": 5456181610,
+            "finished_ns": 5477894358
+          },
+          "waiting": {
+            "task_id": 7,
+            "device_id": "esp32c3-01",
+            "seq": 46,
+            "priority": "normal",
+            "enqueued_ns": 4940392075,
+            "started_ns": 6220076990,
+            "finished_ns": 6581814080
+          },
+          "safe_boundary_ns": 5455772057
+        },
+        {
+          "selected": {
+            "task_id": 10,
+            "device_id": "esp32c3-01",
+            "seq": 49,
+            "priority": "urgent",
+            "enqueued_ns": 5240123272,
+            "started_ns": 5456181610,
+            "finished_ns": 5477894358
+          },
+          "waiting": {
+            "task_id": 8,
+            "device_id": "esp32c3-01",
+            "seq": 47,
+            "priority": "normal",
+            "enqueued_ns": 5016581766,
+            "started_ns": 6605101466,
+            "finished_ns": 6968592084
+          },
+          "safe_boundary_ns": 5455772057
+        },
+        {
+          "selected": {
+            "task_id": 10,
+            "device_id": "esp32c3-01",
+            "seq": 49,
+            "priority": "urgent",
+            "enqueued_ns": 5240123272,
+            "started_ns": 5456181610,
+            "finished_ns": 5477894358
+          },
+          "waiting": {
+            "task_id": 9,
+            "device_id": "esp32c3-01",
+            "seq": 48,
+            "priority": "normal",
+            "enqueued_ns": 5171297060,
+            "started_ns": 6969024002,
+            "finished_ns": 7319321785
+          },
+          "safe_boundary_ns": 5455772057
+        },
+        {
+          "selected": {
+            "task_id": 15,
+            "device_id": "esp32c3-01",
+            "seq": 54,
+            "priority": "urgent",
+            "enqueued_ns": 5831487515,
+            "started_ns": 5836096571,
+            "finished_ns": 5858724003
+          },
+          "waiting": {
+            "task_id": 6,
+            "device_id": "esp32c3-01",
+            "seq": 45,
+            "priority": "normal",
+            "enqueued_ns": 4800303382,
+            "started_ns": 5859069742,
+            "finished_ns": 6219712838
+          },
+          "safe_boundary_ns": 5835726481
+        },
+        {
+          "selected": {
+            "task_id": 15,
+            "device_id": "esp32c3-01",
+            "seq": 54,
+            "priority": "urgent",
+            "enqueued_ns": 5831487515,
+            "started_ns": 5836096571,
+            "finished_ns": 5858724003
+          },
+          "waiting": {
+            "task_id": 7,
+            "device_id": "esp32c3-01",
+            "seq": 46,
+            "priority": "normal",
+            "enqueued_ns": 4940392075,
+            "started_ns": 6220076990,
+            "finished_ns": 6581814080
+          },
+          "safe_boundary_ns": 5835726481
+        },
+        {
+          "selected": {
+            "task_id": 15,
+            "device_id": "esp32c3-01",
+            "seq": 54,
+            "priority": "urgent",
+            "enqueued_ns": 5831487515,
+            "started_ns": 5836096571,
+            "finished_ns": 5858724003
+          },
+          "waiting": {
+            "task_id": 8,
+            "device_id": "esp32c3-01",
+            "seq": 47,
+            "priority": "normal",
+            "enqueued_ns": 5016581766,
+            "started_ns": 6605101466,
+            "finished_ns": 6968592084
+          },
+          "safe_boundary_ns": 5835726481
+        },
+        {
+          "selected": {
+            "task_id": 15,
+            "device_id": "esp32c3-01",
+            "seq": 54,
+            "priority": "urgent",
+            "enqueued_ns": 5831487515,
+            "started_ns": 5836096571,
+            "finished_ns": 5858724003
+          },
+          "waiting": {
+            "task_id": 9,
+            "device_id": "esp32c3-01",
+            "seq": 48,
+            "priority": "normal",
+            "enqueued_ns": 5171297060,
+            "started_ns": 6969024002,
+            "finished_ns": 7319321785
+          },
+          "safe_boundary_ns": 5835726481
+        },
+        {
+          "selected": {
+            "task_id": 15,
+            "device_id": "esp32c3-01",
+            "seq": 54,
+            "priority": "urgent",
+            "enqueued_ns": 5831487515,
+            "started_ns": 5836096571,
+            "finished_ns": 5858724003
+          },
+          "waiting": {
+            "task_id": 11,
+            "device_id": "esp32c3-01",
+            "seq": 50,
+            "priority": "normal",
+            "enqueued_ns": 5362956875,
+            "started_ns": 7319866807,
+            "finished_ns": 7676796541
+          },
+          "safe_boundary_ns": 5835726481
+        },
+        {
+          "selected": {
+            "task_id": 15,
+            "device_id": "esp32c3-01",
+            "seq": 54,
+            "priority": "urgent",
+            "enqueued_ns": 5831487515,
+            "started_ns": 5836096571,
+            "finished_ns": 5858724003
+          },
+          "waiting": {
+            "task_id": 12,
+            "device_id": "esp32c3-01",
+            "seq": 51,
+            "priority": "normal",
+            "enqueued_ns": 5444191812,
+            "started_ns": 7700249728,
+            "finished_ns": 8071216722
+          },
+          "safe_boundary_ns": 5835726481
+        },
+        {
+          "selected": {
+            "task_id": 15,
+            "device_id": "esp32c3-01",
+            "seq": 54,
+            "priority": "urgent",
+            "enqueued_ns": 5831487515,
+            "started_ns": 5836096571,
+            "finished_ns": 5858724003
+          },
+          "waiting": {
+            "task_id": 13,
+            "device_id": "esp32c3-01",
+            "seq": 52,
+            "priority": "normal",
+            "enqueued_ns": 5586404546,
+            "started_ns": 8071751994,
+            "finished_ns": 8423335668
+          },
+          "safe_boundary_ns": 5835726481
+        },
+        {
+          "selected": {
+            "task_id": 15,
+            "device_id": "esp32c3-01",
+            "seq": 54,
+            "priority": "urgent",
+            "enqueued_ns": 5831487515,
+            "started_ns": 5836096571,
+            "finished_ns": 5858724003
+          },
+          "waiting": {
+            "task_id": 14,
+            "device_id": "esp32c3-01",
+            "seq": 53,
+            "priority": "normal",
+            "enqueued_ns": 5677583296,
+            "started_ns": 8424541635,
+            "finished_ns": 8776215254
+          },
+          "safe_boundary_ns": 5835726481
+        },
+        {
+          "selected": {
+            "task_id": 21,
+            "device_id": "esp32c3-01",
+            "seq": 59,
+            "priority": "urgent",
+            "enqueued_ns": 6411918102,
+            "started_ns": 6582279620,
+            "finished_ns": 6604739328
+          },
+          "waiting": {
+            "task_id": 8,
+            "device_id": "esp32c3-01",
+            "seq": 47,
+            "priority": "normal",
+            "enqueued_ns": 5016581766,
+            "started_ns": 6605101466,
+            "finished_ns": 6968592084
+          },
+          "safe_boundary_ns": 6581814080
+        },
+        {
+          "selected": {
+            "task_id": 21,
+            "device_id": "esp32c3-01",
+            "seq": 59,
+            "priority": "urgent",
+            "enqueued_ns": 6411918102,
+            "started_ns": 6582279620,
+            "finished_ns": 6604739328
+          },
+          "waiting": {
+            "task_id": 9,
+            "device_id": "esp32c3-01",
+            "seq": 48,
+            "priority": "normal",
+            "enqueued_ns": 5171297060,
+            "started_ns": 6969024002,
+            "finished_ns": 7319321785
+          },
+          "safe_boundary_ns": 6581814080
+        },
+        {
+          "selected": {
+            "task_id": 21,
+            "device_id": "esp32c3-01",
+            "seq": 59,
+            "priority": "urgent",
+            "enqueued_ns": 6411918102,
+            "started_ns": 6582279620,
+            "finished_ns": 6604739328
+          },
+          "waiting": {
+            "task_id": 11,
+            "device_id": "esp32c3-01",
+            "seq": 50,
+            "priority": "normal",
+            "enqueued_ns": 5362956875,
+            "started_ns": 7319866807,
+            "finished_ns": 7676796541
+          },
+          "safe_boundary_ns": 6581814080
+        },
+        {
+          "selected": {
+            "task_id": 21,
+            "device_id": "esp32c3-01",
+            "seq": 59,
+            "priority": "urgent",
+            "enqueued_ns": 6411918102,
+            "started_ns": 6582279620,
+            "finished_ns": 6604739328
+          },
+          "waiting": {
+            "task_id": 12,
+            "device_id": "esp32c3-01",
+            "seq": 51,
+            "priority": "normal",
+            "enqueued_ns": 5444191812,
+            "started_ns": 7700249728,
+            "finished_ns": 8071216722
+          },
+          "safe_boundary_ns": 6581814080
+        },
+        {
+          "selected": {
+            "task_id": 21,
+            "device_id": "esp32c3-01",
+            "seq": 59,
+            "priority": "urgent",
+            "enqueued_ns": 6411918102,
+            "started_ns": 6582279620,
+            "finished_ns": 6604739328
+          },
+          "waiting": {
+            "task_id": 13,
+            "device_id": "esp32c3-01",
+            "seq": 52,
+            "priority": "normal",
+            "enqueued_ns": 5586404546,
+            "started_ns": 8071751994,
+            "finished_ns": 8423335668
+          },
+          "safe_boundary_ns": 6581814080
+        }
+      ],
+      "normal_with_waiting_urgent": [],
+      "overlaps": [],
+      "same_priority_fifo_inversions": []
+    },
+    "explanation": "Integer CLOCK_MONOTONIC ns. started_ns is after dequeue. Only tasks enqueued no later than the previous task finished_ns are certain to have been waiting before the current dequeue. First dispatch is not audited. FIFO waiting-urgent cases are expected behavior. No observed violation does not prove behavior under unobserved contention.",
+    "priority_behavior_observed": true,
+    "policy_ok": true
+  },
+  "service": {
+    "event": "finished",
+    "success": true,
+    "native_output": "/home/Rylynn/edge-results/project-demo-v2",
+    "port": 50071,
+    "expected": 40,
+    "policy": "priority",
+    "error": null,
+    "final_status": {
+      "policy": "priority",
+      "queue_depth": 0,
+      "queue_capacity": 64,
+      "accepted": 40,
+      "completed": 40,
+      "rejected": 0,
+      "running": false,
+      "active": false,
+      "window": 8,
+      "passes": 1000000,
+      "accepting": false,
+      "fatal": false
+    }
+  },
+  "data_source": "synthetic",
+  "stage": "complete"
+}

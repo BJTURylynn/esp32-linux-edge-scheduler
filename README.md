@@ -1,14 +1,26 @@
-# ColorEasyDuino + Linux 边缘任务调度与只读运维助手
+# ESP32-C3 / ColorEasyDuino + Linux 边缘任务调度与只读运维助手
 
-本项目当前使用粉色立创 ColorEasyDuino（ATmega328P / Arduino Uno）通过 USB 串口上传合成数据，经 Python 转发接入 Linux C 调度器，并由只读助手解释结果。设备没有板载 Wi-Fi；原有 ESP32 固件保留为可选实现。原始规划保存在 [docs/original-plan.md](docs/original-plan.md)。当前实现及验收证据见 [docs/implementation.md](docs/implementation.md)。
+本项目支持两种已实物接入的设备：ESP32-C3 通过 Wi-Fi/TCP 上传合成数据；粉色立创 ColorEasyDuino（ATmega328P / Arduino Uno）通过 USB 串口上传。两者经 Windows Python 转发接入 WSL Ubuntu 的 Linux C 调度器，并由只读助手解释结果。原有 ESP-IDF 固件也保留为可选实现。原始规划保存在 [docs/original-plan.md](docs/original-plan.md)。当前实现及验收证据见 [docs/implementation.md](docs/implementation.md)。
 
-历史版本已完成 Linux、ESP32 固件构建和集成验证，实测报告及图表见 [验收记录](docs/validation.md) 与 [证据快照](docs/evidence/2026-10-23/README.md)。ESP32 尚未烧录，真实无线通信与断线恢复仍待接板验证。
+历史版本已完成 Linux、ESP32 固件构建和集成验证，实测报告及图表见 [验收记录](docs/validation.md) 与 [证据快照](docs/evidence/2026-10-23/README.md)。原 ESP-IDF 固件尚未进行本次实物烧录；另增的 ESP32-C3 Arduino 固件已真实无线接入，见后文。真实无线掉线恢复仍待另行验收。
 
 2026-10-25 已在本机 WSL Ubuntu 补齐此前 Windows 跳过的 9 项：普通与 ASan/UBSan 构建下均为 42 项测试全部通过，另保存六次调度对照实验和离线助手结果。见 [WSL 本机补验记录](docs/evidence/2026-10-25-wsl/README.md)。
 
 粉色板已真实烧录并接入：COM10 → Windows 串口转发 → Ubuntu C 服务，20 个任务全部完成、0 拒绝，逐帧数值参考验证通过。完整自动测试为 59 项通过；见 [粉色板接入说明](docs/coloreasyduino.md) 与 [实物证据](docs/evidence/coloreasyduino-usb/README.md)。
 
 这里的优先级是**应用队列选择顺序**：一个工作线程，已开始的任务不被抢占；不修改内核调度器，不提供硬实时保证。
+
+## 一键运行项目
+
+准备好两块板与同一2.4GHz局域网后，可一条命令完成Linux启动、双设备接入、完成量等待、正常停服、数据归档、数值验证和调度审计。
+
+```powershell
+python -m tools.project_demo --esp-host <ESP32实际IPv4> --uno-port COM10 --output D:/Codex/esp32-linux-edge-scheduler/outputs/my-project-demo
+```
+
+该一键流程已经用两块实物重跑通过：40任务全部完成、0拒绝，数值与调度审计通过，服务正常自动收尾。见 [一键验收证据](docs/evidence/project-demo/README.md)。
+
+完整准备、重启配置、结果判断和代码学习路径见 [快速开始](docs/quickstart.md)。默认不需要API Key，所有设备样本都是synthetic数据。
 
 ## 目录
 
@@ -17,7 +29,9 @@
 | `linux/` | C11 TCP 接收、严格 NDJSON 解析、有界队列、滤波/RMS、日志、C 测试 |
 | `firmware/coloreasyduino/` | 当前 Uno 设备端，串口流式生成数据，已实物烧录 |
 | `firmware/main/` | 原 ESP-IDF 设备端，作为可选实现保留 |
+| `firmware/esp32c3-arduino/` | ESP32-C3 Arduino Wi-Fi TCP 设备端，已实物烧录 |
 | `tools/` | 串口桥接（可选 pyserial 依赖），以及标准库回放、实验、统计、只读查询 |
+| `web/` | EdgeScope 本地聊天工作台、历史证据概览和分组指标 |
 | `tests/` | Python 单测与真实服务黑盒集成测试 |
 | `scripts/vmware*`、`deploy/vmware/` | 独立 Ubuntu VMware 环境的创建与连接 |
 | `.local/vmware/` | 本机镜像、虚拟磁盘和私钥，全部忽略提交 |
@@ -79,11 +93,27 @@ python3 -m tools.agent explain --report results/comparison/report.json
 
 见 [VMware 操作说明](deploy/vmware/README.md)。VM、镜像和项目都在当前目录，不修改现有虚拟机。Linux 编译与实验在 guest 内进行。
 
+## 双设备任务调度
+
+ESP32-C3与Arduino已同时接入同一Linux队列：实物40任务全部完成、0拒绝，观察到8次紧急任务优先处理；同设备数据的FIFO/priority六轮对照均完成且数值验证通过。启动及日志审计方法见 [双设备调度说明](docs/dual-device-scheduling.md)。所有样本为synthetic数据，公平回放采用另设的合成到达间隔。
+
+## ESP32-C3 实物无线接入
+
+新增 Arduino ESP32-C3 TCP 设备端和 Windows→WSL 转发入口，USB只用于配置和诊断；启动步骤、NAT下的实际数据路径与验收方式见 [ESP32-C3 无线接入说明](docs/esp32c3-wifi.md)。这与现有粉色板串口方案分别保留。
+
 ## ESP32 可选实现
 
 固件及接线/配置/构建步骤见 [docs/firmware.md](docs/firmware.md)。默认是合成数据，不需要传感器。设备参数由 `idf.py menuconfig` 设置，Wi-Fi 密码只保存在忽略提交的本地配置中。
 
 电脑到 NAT 虚拟机的回放可以直接使用 guest 地址；真实 ESP32 通常不能直接访问 VMware NAT 私网。接板时将**本项目 VM**切换到可达的桥接网络，确认开发板与 VM 的 IPv4 连通，再将服务绑定到 VM 的局域网地址。具体防火墙/路由需要按实际网络配置。没有应用层 ACK，发送成功仅表示 TCP 接受数据，不表示服务已入队或完成；最终结果以 Linux CSV 为准。
+
+## 真实大模型只读解释
+
+已接入用户选择的 `coding-glm-5.3-flash-free` 并完成真实两轮工具调用验证：模型读取 `query_status`、`read_report` 后解释实验数字，两次HTTP200、最终stop，未回退。入口 `python -m tools.agent_live --output <新目录>` 会隐藏输入Key；配置、输出完整性检查与实测证据见 [真实模型接入](docs/live-model.md)。模型仍只解释证据，不控制实时调度。
+
+### 本地网页工作台
+
+在项目根目录运行 `python -m tools.web_agent`，打开 <http://127.0.0.1:8765>。EdgeScope 提供“示例数据 / 本机实验”两个入口、聊天、实际工具记录、FIFO/priority 指标和离线规则模式；Key 仅保存在本地后端进程内存中。示例为作者历史结果，本机入口只读取 `--status` / `--report` 配置，未运行时显示“暂无实验记录”，不借用示例数据。每条问题独立分析，文件快照不代表设备当前在线。无需新增依赖，启动与数据路径配置见 [网页工作台说明](docs/web-workbench.md)。
 
 ## 只读助手与范围
 
@@ -100,4 +130,4 @@ python3 -m tools.agent ask "为什么紧急任务快了，普通任务却更慢�
 
 问答扩展及关闭状态修复的本机测试范围见 [2026-10-25 验证记录](docs/validation-2026-10-25.md)；它与前面的 VMware 历史实测分开记录。
 
-通信协议是受限的合成数据测试协议，见 [docs/protocol.md](docs/protocol.md)。当前适用于本机/可信实验网络；第一版没有鉴权、TLS、持久任务队列、ACK、去重或公平性老化。持续紧急流可能使普通任务饥饿。真实开发板重连、无线网络行为和演示录像需要接板后验收，不能由回放测试替代。
+通信协议是受限的合成数据测试协议，见 [docs/protocol.md](docs/protocol.md)。当前适用于本机/可信实验网络；第一版没有鉴权、TLS、持久任务队列、ACK、去重或公平性老化。持续紧急流可能使普通任务饥饿。ESP32-C3 已验证两批共25任务无线接入及计算正确；真实断线恢复、长时间无线稳定性和演示录像尚未验收，不能由回放测试替代。

@@ -1,0 +1,22 @@
+{
+  "forwarded": 20,
+  "invalid": 0,
+  "oversized": 0,
+  "incomplete": 0,
+  "serial_opens": 1,
+  "serial_reconnects": 0,
+  "serial_errors": 0,
+  "tcp_connections": 1,
+  "tcp_errors": 0,
+  "dropped": 0,
+  "uncertain": 0,
+  "running": false,
+  "port": "COM10",
+  "baud": 115200,
+  "host": "127.0.0.1",
+  "tcp_port": 9000,
+  "max_frame": 8192,
+  "forwarded_semantics": "sendall completed, NOT server accepted/completed",
+  "last_error": null,
+  "elapsed_seconds": 8.0
+}

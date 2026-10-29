@@ -4,9 +4,11 @@ No provider, model, or credential is selected implicitly. The caller opts in by
 setting EDGE_AGENT_MODEL, EDGE_AGENT_BASE_URL, and EDGE_AGENT_API_KEY. Compatible
 providers must support tools, tool_choice, parallel_tool_calls, and max_tokens.
 """
+import copy
 import json
 import math
 import os
+import time
 from http.client import HTTPException
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit, urlunsplit
@@ -94,7 +96,8 @@ def _assistant_message(payload):
 
 
 class OpenAICompatibleClient:
-    def __init__(self, *, model, base_url, api_key, timeout=20.0, opener=None):
+    def __init__(self, *, model, base_url, api_key, timeout=20.0,
+                 max_output_tokens=800, opener=None):
         if not isinstance(model, str) or not model.strip():
             raise ModelError("A model must be explicitly configured.")
         if (not isinstance(api_key, str) or not api_key.strip()
@@ -104,23 +107,36 @@ class OpenAICompatibleClient:
         if (isinstance(timeout, bool) or not isinstance(timeout, (int, float))
                 or not math.isfinite(timeout) or not 0.1 <= timeout <= 120.0):
             raise ModelError("Model timeout must be between 0.1 and 120 seconds.")
+        if type(max_output_tokens) is not int or not 64 <= max_output_tokens <= 4096:
+            raise ModelError("Model output token budget must be an integer between 64 and 4096.")
         self.model = model
         self.timeout = float(timeout)
+        self.max_output_tokens = max_output_tokens
         self._url = _endpoint(base_url)
         self._api_key = api_key
         self._opener = opener if opener is not None else build_opener(_NoRedirect())
+        self._last_response_metadata = {}
+
+    @property
+    def last_response_metadata(self):
+        """A detached, read-only diagnostic view; never request or reasoning text."""
+        return copy.deepcopy(self._last_response_metadata)
 
     @classmethod
-    def from_env(cls, *, model=None, base_url=None, timeout=20.0):
+    def from_env(cls, *, model=None, base_url=None, timeout=20.0,
+                 max_output_tokens=800):
         selected_model = os.environ.get("EDGE_AGENT_MODEL") if model is None else model
         selected_url = os.environ.get("EDGE_AGENT_BASE_URL") if base_url is None else base_url
         api_key = os.environ.get("EDGE_AGENT_API_KEY")
         if not selected_model or not selected_url or not api_key:
             raise ModelError("Configure EDGE_AGENT_MODEL, EDGE_AGENT_BASE_URL, and EDGE_AGENT_API_KEY before using the model.")
         return cls(model=selected_model, base_url=selected_url,
-                   api_key=api_key, timeout=timeout)
+                   api_key=api_key, timeout=timeout,
+                   max_output_tokens=max_output_tokens)
 
     def complete(self, messages, tools):
+        self._last_response_metadata = {}
+        started = time.monotonic()
         if not isinstance(messages, list) or not messages or not isinstance(tools, list):
             raise ModelError("Model messages and tools must be valid lists.")
         try:
@@ -130,7 +146,7 @@ class OpenAICompatibleClient:
                 "tools": tools,
                 "tool_choice": "auto",
                 "parallel_tool_calls": False,
-                "max_tokens": 800,
+                "max_tokens": self.max_output_tokens,
             }, ensure_ascii=False, allow_nan=False).encode("utf-8")
             request = Request(self._url, data=body, method="POST", headers={
                 "Authorization": "Bearer " + self._api_key,
@@ -160,4 +176,30 @@ class OpenAICompatibleClient:
             payload = json.loads(data.decode("utf-8"), parse_constant=reject_constant)
         except (UnicodeError, ValueError, RecursionError):
             raise ModelError("Model API returned invalid JSON.") from None
+        # Deliberately retain only bounded response identifiers and token counts.
+        # No headers, request messages, answer or reasoning content is copied.
+        metadata = {"status": status,
+                    "elapsed_seconds": round(time.monotonic() - started, 6)}
+        if isinstance(payload, dict):
+            for field in ("id", "model"):
+                value = payload.get(field)
+                if (isinstance(value, str) and len(value) <= 256
+                        and not any(ord(char) < 32 or ord(char) == 127 for char in value)):
+                    metadata[field] = value
+            choices = payload.get("choices")
+            if isinstance(choices, list) and choices and isinstance(choices[0], dict):
+                reason = choices[0].get("finish_reason")
+                if isinstance(reason, str) and len(reason) <= 64:
+                    metadata["finish_reason"] = reason
+            usage = payload.get("usage")
+            if isinstance(usage, dict):
+                metadata["usage"] = {
+                    field: usage[field]
+                    for field in ("prompt_tokens", "completion_tokens", "total_tokens")
+                    if type(usage.get(field)) is int and usage[field] >= 0}
+        self._last_response_metadata = metadata
+        if metadata.get("finish_reason") == "length":
+            raise ModelError("Model API output was truncated by the token limit.")
+        if metadata.get("finish_reason") == "content_filter":
+            raise ModelError("Model API output was blocked by a content filter.")
         return _assistant_message(payload)
