@@ -108,9 +108,11 @@ class LLMTransportTests(unittest.TestCase):
             self.assertEqual(client.model, "env-model")
             self.assertEqual(client.timeout, 20.0)
             overridden = OpenAICompatibleClient.from_env(
-                model="chosen-model", base_url="http://localhost:8080/v1", timeout=3)
+                model="chosen-model", base_url="http://localhost:8080/v1", timeout=3,
+                max_output_tokens=2048)
             self.assertEqual(overridden.model, "chosen-model")
             self.assertEqual(overridden._url, "http://localhost:8080/v1/chat/completions")
+            self.assertEqual(overridden.max_output_tokens, 2048)
         for missing in environment:
             incomplete = {key: value for key, value in environment.items() if key != missing}
             with self.subTest(missing=missing), patch.dict("os.environ", incomplete, clear=True):
@@ -227,6 +229,91 @@ class LLMTransportTests(unittest.TestCase):
             with self.subTest(messages=messages), self.assertRaises(ModelError):
                 self.client(opener).complete(messages, tools)
             self.assertEqual(opener.requests, [])
+
+    def test_output_token_budget_bounds_and_request(self):
+        for budget in (64, 800, 2048, 4096):
+            opener = FakeOpener()
+            client = self.client(opener, max_output_tokens=budget)
+            self.assertEqual(client.complete(MESSAGES, TOOLS), ANSWER)
+            self.assertEqual(json.loads(opener.requests[0][0].data)["max_tokens"], budget)
+        for budget in (0, 63, 4097, True, False, 800.0, "800", None,
+                       float("nan"), float("inf")):
+            opener = FakeOpener()
+            with self.subTest(budget=budget), self.assertRaises(ModelError):
+                self.client(opener, max_output_tokens=budget)
+            self.assertEqual(opener.requests, [])
+
+    def test_truncated_and_filtered_answers_are_rejected(self):
+        for reason, expected in (("length", "truncated"), ("content_filter", "content filter")):
+            for message in (ANSWER, {"role": "assistant", "content": None}):
+                payload = {"id": "completion-1", "model": "test-model", "choices": [
+                    {"message": message, "finish_reason": reason}]}
+                client = self.client(FakeOpener(json.dumps(payload).encode()))
+                with self.subTest(reason=reason, message=message), self.assertRaisesRegex(ModelError, expected):
+                    client.complete(MESSAGES, TOOLS)
+                self.assertEqual(client.last_response_metadata["finish_reason"], reason)
+                self.assertEqual(client.last_response_metadata["status"], 200)
+
+    def test_response_metadata_is_a_detached_whitelist(self):
+        payload = {
+            "id": "completion-123", "model": "provider-model", "headers": {"Authorization": "test-key"},
+            "messages": MESSAGES, "secret": "DO_NOT_SAVE_SECRET",
+            "usage": {"prompt_tokens": 12, "completion_tokens": 7, "total_tokens": 19,
+                      "completion_tokens_details": {"reasoning_text": "DO_NOT_SAVE_REASONING"}},
+            "choices": [{"message": dict(ANSWER, reasoning_content="DO_NOT_SAVE_REASONING"),
+                         "finish_reason": "stop", "raw": "DO_NOT_SAVE_RAW"}]}
+        client = self.client(FakeOpener(json.dumps(payload).encode()))
+        client.complete(MESSAGES, TOOLS)
+        metadata = client.last_response_metadata
+        self.assertEqual(set(metadata), {"id", "model", "status", "finish_reason", "usage", "elapsed_seconds"})
+        self.assertEqual(metadata["usage"], {"prompt_tokens": 12, "completion_tokens": 7, "total_tokens": 19})
+        self.assertEqual(metadata["id"], "completion-123")
+        self.assertGreaterEqual(metadata["elapsed_seconds"], 0)
+        encoded = json.dumps(metadata)
+        for excluded in ("test-key", "Authorization", "DO_NOT_SAVE", "messages", "reasoning_content", ANSWER["content"]):
+            self.assertNotIn(excluded, encoded)
+        metadata["usage"]["total_tokens"] = 999
+        self.assertEqual(client.last_response_metadata["usage"]["total_tokens"], 19)
+        with self.assertRaises(AttributeError):
+            client.last_response_metadata = {}
+
+    def test_metadata_usage_accepts_only_nonnegative_integer_counts(self):
+        for invalid in (-1, True, 1.0, "1", None):
+            payload = {"choices": [{"message": ANSWER}],
+                       "usage": {"prompt_tokens": invalid, "completion_tokens": 0, "total_tokens": 1,
+                                 "untrusted": "DO_NOT_SAVE"}}
+            client = self.client(FakeOpener(json.dumps(payload).encode()))
+            client.complete(MESSAGES, TOOLS)
+            self.assertEqual(client.last_response_metadata["usage"], {"completion_tokens": 0, "total_tokens": 1})
+
+    def test_new_call_clears_previous_response_metadata(self):
+        for failure in ("invalid_input", "network"):
+            opener = FakeOpener()
+            client = self.client(opener)
+            client.complete(MESSAGES, TOOLS)
+            self.assertIn("status", client.last_response_metadata)
+            if failure == "network":
+                opener.error = OSError("test-key")
+                inputs = MESSAGES
+            else:
+                inputs = []
+            with self.assertRaises(ModelError):
+                client.complete(inputs, TOOLS)
+            self.assertEqual(client.last_response_metadata, {})
+
+    def test_agent_cli_forwards_the_explicit_output_budget(self):
+        from contextlib import redirect_stdout
+        from tools.agent import main
+        result = {"mode": "llm", "reason": None, "answer": "answer", "evidence_text": "evidence"}
+        with patch("sys.argv", ["agent", "ask", "解释报告", "--backend", "llm", "--json",
+                                "--max-output-tokens", "2048"]), \
+             patch("tools.agent.ReadOnlyAgent") as agent, \
+             patch("tools.llm.OpenAICompatibleClient.from_env") as client, \
+             redirect_stdout(io.StringIO()):
+            agent.return_value.ask.return_value = result
+            main()
+        client.assert_called_once_with(model=None, base_url=None, timeout=20.0,
+                                       max_output_tokens=2048)
 
 
 if __name__ == "__main__":

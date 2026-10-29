@@ -106,6 +106,10 @@ ESP32-C3与Arduino已同时接入同一Linux队列：实物40任务全部完成�
 
 电脑到 NAT 虚拟机的回放可以直接使用 guest 地址；真实 ESP32 通常不能直接访问 VMware NAT 私网。接板时将**本项目 VM**切换到可达的桥接网络，确认开发板与 VM 的 IPv4 连通，再将服务绑定到 VM 的局域网地址。具体防火墙/路由需要按实际网络配置。没有应用层 ACK，发送成功仅表示 TCP 接受数据，不表示服务已入队或完成；最终结果以 Linux CSV 为准。
 
+## 真实大模型只读解释
+
+已接入用户选择的 `coding-glm-5.3-flash-free` 并完成真实两轮工具调用验证：模型读取 `query_status`、`read_report` 后解释实验数字，两次HTTP200、最终stop，未回退。入口 `python -m tools.agent_live --output <新目录>` 会隐藏输入Key；配置、输出完整性检查与实测证据见 [真实模型接入](docs/live-model.md)。模型仍只解释证据，不控制实时调度。
+
 ## 只读助手与范围
 
 `python3 -m tools.agent status|report|explain` 保留原有的离线查询和规则解释。新增 `ask` 自然语言入口：默认仍完全离线，显式选择 `--backend llm` 并配置模型后，模型可以调用同样两个只读工具，读取状态或实验报告，再生成解释。关闭它不影响 C 核心。
