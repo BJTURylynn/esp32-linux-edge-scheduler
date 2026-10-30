@@ -1,6 +1,6 @@
 """Start the owned C dispatcher, hardware relays and local web workbench.
 
-ESP32 Wi-Fi must be configured first. Foreground lifetime: Ctrl+C, STOP or stdin
+ESP32 Wi-Fi can be configured from the page. Foreground lifetime: Ctrl+C, STOP or stdin
 EOF stops only this invocation's service/relays and archives C output on D:.
 """
 import argparse
@@ -18,6 +18,7 @@ import time
 
 from .dispatch_client import DispatchClient, DispatchError
 from .dispatch_gateway import run_gateway
+from .dispatch_wifi import EspWiFiManager, WiFiError
 from .experiment import free_port
 from .project_demo import read_events, wait_event, windows_to_wsl
 
@@ -26,10 +27,17 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def validate(args):
-    if ipaddress.ip_address(args.esp_host).version != 4:
-        raise ValueError('ESP32 IPv4 required')
-    if not isinstance(args.uno_port, str) or not 1 <= len(args.uno_port) <= 64:
+    if args.esp_host is not None:
+        address = ipaddress.ip_address(args.esp_host)
+        if (address.version != 4 or not address.is_private or address.is_loopback
+                or address.is_multicast or address.is_unspecified or str(address) == '255.255.255.255'):
+            raise ValueError('ESP32 local IPv4 required')
+    if args.uno_port is not None and (not isinstance(args.uno_port, str) or not 1 <= len(args.uno_port) <= 64):
         raise ValueError('actual Uno serial port required')
+    esp_serial = getattr(args, 'esp_serial', None)
+    if esp_serial is not None and (not isinstance(esp_serial, str) or not 1 <= len(esp_serial) <= 64
+                                   or esp_serial == args.uno_port):
+        raise ValueError('ESP32 USB port must be valid and different from Uno')
     if args.policy not in ('fifo', 'priority'):
         raise ValueError('invalid policy')
     if type(args.web_port) is not int or not 1 <= args.web_port <= 65535:
@@ -70,6 +78,10 @@ def run(args, *, stop=None, gateway_runner=run_gateway,
     except OSError:
         web.server_close()
         raise
+    wifi = EspWiFiManager(app.dispatch_client, args.output/'wifi', host=args.esp_host,
+                         serial_port=getattr(args, 'esp_serial', None), uno_port=args.uno_port,
+                         gateway_runner=gateway_runner)
+    app.wifi_controller = wifi
     stop = stop or threading.Event()
     result = dict(success=False, error=None, stage='starting', central_port=port,
                   web_url=f'http://127.0.0.1:{args.web_port}/#dispatch', hardware_validated=False,
@@ -126,8 +138,9 @@ def run(args, *, stop=None, gateway_runner=run_gateway,
                         if time.monotonic() > deadline:
                             raise TimeoutError('Windows localhost forwarding unavailable')
                         time.sleep(.1)
-                for device, values in [('uno-01', dict(serial_port=args.uno_port)),
-                                       ('esp32c3-01', dict(esp_host=args.esp_host))]:
+                wifi.start()
+                for device, values in ([('uno-01', dict(serial_port=args.uno_port))]
+                                       if args.uno_port else []):
                     thread = threading.Thread(target=relay, args=(device,), kwargs=values, daemon=True)
                     thread.start()
                     threads.append(thread)
@@ -158,6 +171,11 @@ def run(args, *, stop=None, gateway_runner=run_gateway,
                     if thread.is_alive():
                         result['success'] = False
                         result['error'] = result['error'] or 'gateway shutdown timed out'
+                try:
+                    wifi.close()
+                except WiFiError:
+                    result['success'] = False
+                    result['error'] = result['error'] or 'ESP32 connection cleanup timed out'
                 if process is not None:
                     if process.poll() is None:
                         try:
@@ -189,8 +207,9 @@ def run(args, *, stop=None, gateway_runner=run_gateway,
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--esp-host', required=True)
-    p.add_argument('--uno-port', required=True)
+    p.add_argument('--esp-host', help='optional existing ESP32 IPv4; can attach from page later')
+    p.add_argument('--esp-serial', help='optional ESP32 USB port preselection for page Wi-Fi setup')
+    p.add_argument('--uno-port', help='optional actual Uno port; omit for ESP32-only setup')
     p.add_argument('--output', type=Path, required=True)
     p.add_argument('--policy', choices=('fifo', 'priority'), default='priority')
     p.add_argument('--distribution', default='Ubuntu-24.04')

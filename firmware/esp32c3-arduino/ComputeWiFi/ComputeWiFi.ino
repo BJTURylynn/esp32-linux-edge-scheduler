@@ -1,6 +1,6 @@
 /* ESP32-C3 v2 compute worker, synthetic filter/RMS actually runs on this MCU.
  * Arduino ESP32 3.3.12: FlashMode=dio,FlashFreq=40,FlashSize=8M.
- * USB: CONFIG -> SSID -> password (never echoed/saved); SCAN diagnostics.
+ * USB: CONFIG -> SSID -> password (never echoed/saved); SCAN/STATUS diagnostics.
  * TCP 9001: v2 HELLO/WELCOME/TASK/ACCEPT/RESULT and PING/PONG only.
  */
 #include <Arduino.h>
@@ -141,6 +141,45 @@ static void configureWifi() {
                 (unsigned long)(millis() - started));
 }
 
+/* Read-only observation is available even while the TCP worker is attached.
+ * Connection to Wi-Fi and connection to the central scheduler are separate:
+ * this line reports the former without echoing SSID or credentials. */
+static void reportWifiStatus() {
+  const bool connected = WiFi.status() == WL_CONNECTED;
+  const String ip = connected ? WiFi.localIP().toString() : String("0.0.0.0");
+  Serial.printf("WIFI_STATUS state=%s ip=%s port=%u rssi_dbm=%d protocol=2\n",
+                connected ? "connected" : "disconnected", ip.c_str(), TCP_PORT,
+                connected ? (int)WiFi.RSSI() : 0);
+}
+
+/* Bounded USB command service shared by the outer loop and attached worker.
+ * Changing networks or scanning while attached could interrupt an in-flight
+ * task. The gateway must disconnect first; STATUS never changes the network. */
+static void pollControl(bool workerConnected) {
+  unsigned budget = 64;
+  while (Serial.available() && budget--) {
+    const int input = Serial.read();
+    if (input < 0) break;
+    if (!controlLength && !controlOverflow) controlStarted = millis();
+    if (input == '\n') {
+      if (controlLength && control[controlLength - 1] == '\r') --controlLength;
+      control[controlLength] = '\0';
+      if (controlOverflow) Serial.println("CONTROL_REJECTED reason=too_long");
+      else if (!strcmp(control, "STATUS")) reportWifiStatus();
+      else if (!strcmp(control, "CONFIG") || !strcmp(control, "SCAN")) {
+        if (workerConnected) Serial.println("CONTROL_REJECTED reason=worker_connected");
+        else if (!strcmp(control, "CONFIG")) configureWifi();
+        else scanTarget();
+      } else Serial.println("CONTROL_REJECTED reason=unknown_command");
+      controlLength = 0; controlOverflow = false;
+    } else if (controlLength < sizeof(control) - 1 && !controlOverflow) control[controlLength++] = (char)input;
+    else controlOverflow = true;
+  }
+  if ((controlLength || controlOverflow) && millis() - controlStarted > CONFIG_TIMEOUT_MS) {
+    controlLength = 0; controlOverflow = false; Serial.println("CONTROL_REJECTED reason=timeout");
+  }
+}
+
 static void serveClient(WiFiClient &client) {
   client.setNoDelay(true);
   WorkerTCPStream channel(client);
@@ -148,6 +187,7 @@ static void serveClient(WiFiClient &client) {
   Serial.println("WORKER_CONNECTED protocol=2");
   uint32_t lastReceived = millis();
   while (client.connected() && channel.healthy() && WiFi.status() == WL_CONNECTED) {
+    pollControl(true);
     worker.poll(channel); channel.flush();
     unsigned budget = 128;
     while (client.available() && budget--) {
@@ -165,29 +205,11 @@ void setup() {
   Serial.begin(115200);
   WiFi.persistent(false); WiFi.setAutoReconnect(false);
   delay(1200);
-  Serial.println("READY commands=CONFIG,SCAN tcp=9001 protocol=2 compute=on_device");
+  Serial.println("READY commands=CONFIG,SCAN,STATUS tcp=9001 protocol=2 compute=on_device");
 }
 
 void loop() {
-  unsigned budget = 64;
-  while (Serial.available() && budget--) {
-    const int input = Serial.read();
-    if (input < 0) break;
-    if (!controlLength && !controlOverflow) controlStarted = millis();
-    if (input == '\n') {
-      if (controlLength && control[controlLength - 1] == '\r') --controlLength;
-      control[controlLength] = '\0';
-      if (controlOverflow) Serial.println("CONTROL_REJECTED reason=too_long");
-      else if (!strcmp(control, "CONFIG")) configureWifi();
-      else if (!strcmp(control, "SCAN")) scanTarget();
-      else Serial.println("CONTROL_REJECTED reason=unknown_command");
-      controlLength = 0; controlOverflow = false;
-    } else if (controlLength < sizeof(control) - 1 && !controlOverflow) control[controlLength++] = (char)input;
-    else controlOverflow = true;
-  }
-  if ((controlLength || controlOverflow) && millis() - controlStarted > CONFIG_TIMEOUT_MS) {
-    controlLength = 0; controlOverflow = false; Serial.println("CONTROL_REJECTED reason=timeout");
-  }
+  pollControl(false);
   if (serverStarted && WiFi.status() != WL_CONNECTED) {
     Serial.println("WIFI_LOST waiting=CONFIG no_replay=1"); stopWifi();
   }

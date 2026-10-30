@@ -4,6 +4,7 @@ Model tools remain read-only. Explicit human task submission uses a separate
 fixed central-service client. Bind to loopback; model keys stay in memory.
 """
 import argparse
+from contextlib import nullcontext
 import getpass
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
@@ -19,6 +20,7 @@ from .agent import ReadOnlyAgent
 from .agent_live import BASE_URL, MODEL, ROOT, RecordingClient, _redact
 from .llm import ModelError, OpenAICompatibleClient
 from .dispatch_client import DispatchClient, DispatchError
+from .dispatch_wifi import WiFiError
 
 
 MAX_BODY = 16384
@@ -32,6 +34,7 @@ STATIC = {"/": ("index.html", "text/html; charset=utf-8"),
           "/styles.css": ("styles.css", "text/css; charset=utf-8"),
           "/dispatch.js": ("dispatch.js", "text/javascript; charset=utf-8"),
           "/dispatch.css": ("dispatch.css", "text/css; charset=utf-8"),
+          "/wifi.js": ("wifi.js", "text/javascript; charset=utf-8"),
           "/app.js": ("app.js", "text/javascript; charset=utf-8")}
 
 
@@ -61,12 +64,13 @@ class WebApp:
     def __init__(self, status_path, report_path, api_key=None, model=MODEL,
                  base_url=BASE_URL, client_factory=OpenAICompatibleClient,
                  dispatch_host="127.0.0.1", dispatch_port=9100,
-                 dispatch_client_factory=DispatchClient):
+                 dispatch_client_factory=DispatchClient, wifi_controller=None):
         self.status_path = Path(status_path)
         self.report_path = Path(report_path)
         self.model, self.base_url = model, base_url
         self.client_factory = client_factory
         self.dispatch_client = dispatch_client_factory(host=dispatch_host, port=dispatch_port)
+        self.wifi_controller = wifi_controller
         self.csrf_token = secrets.token_urlsafe(32)
         self._key = None
         self._key_lock = threading.Lock()
@@ -106,6 +110,50 @@ class WebApp:
     def dispatch_state(self):
         result = self.dispatch_client.state()
         return {**result, "available": True, "csrf_token": self.csrf_token}
+
+    def wifi_state(self):
+        # A missing central handshake cannot establish whether Wi-Fi itself is
+        # disconnected. USB observations expire; never reuse history as live.
+        base = (self.wifi_controller.snapshot() if self.wifi_controller else
+                {"supported": False, "busy": False, "phase": "idle", "host": None,
+                 "serial_port": None, "observation": {},
+                 "message": "请通过 tools.dispatch_start 统一启动器启用网页配网。"})
+        node, central_available = {}, False
+        try:
+            central = self.dispatch_client.state()
+            central_available = True
+            node = next((n for n in central.get("nodes", [])
+                         if n.get("device") == "esp32c3-01"), {})
+        except DispatchError:
+            pass
+        online = node.get("state") in ("idle", "running", "dispatching")
+        observation = base.get("observation") or {}
+        observed_at = observation.get("observed_at")
+        fresh = (type(observed_at) in (int, float)
+                 and 0 <= time.time() - observed_at <= 15)
+        wifi_state, source = "unknown", "unknown"
+        if online:
+            wifi_state, source = "connected", "central_tcp"
+        elif base.get("phase") == "connecting":
+            wifi_state = "connecting"
+        elif fresh and observation.get("state") in ("connected", "disconnected"):
+            wifi_state, source = observation["state"], observation.get("source", "usb")
+        return {**base, "central_available": central_available,
+                "central_state": node.get("state", "offline") if central_available else "unknown",
+                "wifi_state": wifi_state, "wifi_source": source, "csrf_token": self.csrf_token}
+
+    def wifi_ports(self):
+        if not self.wifi_controller:
+            return {"ports": [], "serial_available": False, "supported": False}
+        return self.wifi_controller.ports()
+
+    def wifi_operation(self, operation, body):
+        if not self.wifi_controller:
+            raise ApiError(409, "当前启动方式未启用配网，请使用 tools.dispatch_start。")
+        return getattr(self.wifi_controller, operation)(body)
+
+    def task_guard(self):
+        return self.wifi_controller.task_guard() if self.wifi_controller else nullcontext()
 
     @staticmethod
     def dispatch_run(body):
@@ -282,6 +330,11 @@ class Handler(BaseHTTPRequestHandler):
                 if urlsplit(self.path).query:
                     raise ApiError(400, "中央服务地址由启动配置指定。")
                 self._send(200, self.server.app.dispatch_state())
+            elif path in ("/api/dispatch/wifi", "/api/dispatch/wifi/ports"):
+                if urlsplit(self.path).query:
+                    raise ApiError(400, "连接参数不能放在网址中。")
+                self._send(200, self.server.app.wifi_ports() if path.endswith("/ports")
+                           else self.server.app.wifi_state())
             elif path == "/api/state":
                 query = parse_qs(urlsplit(self.path).query, keep_blank_values=True)
                 if set(query) - {"source"} or len(query.get("source", ["example"])) != 1:
@@ -297,6 +350,8 @@ class Handler(BaseHTTPRequestHandler):
                 raise ApiError(404, "未找到该资源。")
         except ApiError as exc:
             self._send(exc.status, {"error": str(exc)})
+        except WiFiError as exc:
+            self._send(exc.status, {"error": str(exc)})
         except DispatchError:
             self._send(503, {"available": False, "error": "中央调度服务未连接，请启动第二版派发服务。"})
         except (OSError, ValueError):
@@ -306,22 +361,32 @@ class Handler(BaseHTTPRequestHandler):
         try:
             body = self._post_body()
             path = urlsplit(self.path).path
+            response_status = 200
             if path == "/api/config":
                 result = self.server.app.configure(body)
             elif path == "/api/chat":
                 result = self.server.app.chat(body)
             elif path == "/api/dispatch/tasks":
-                self.server.app.dispatch_run(body)
-                result = self.server.app.dispatch_client.submit(body)
+                with self.server.app.task_guard():
+                    self.server.app.dispatch_run(body)
+                    result = self.server.app.dispatch_client.submit(body)
             elif path.startswith("/api/dispatch/tasks/") and path.endswith("/retry"):
                 task_id = path[len("/api/dispatch/tasks/"):-len("/retry")]
                 if set(body) != {"run_id"} or not task_id.isascii() or not task_id.isdecimal() or not 1 <= len(task_id) <= 10:
                     raise ApiError(400, "重试需要有效任务编号和当前运行编号。")
-                result = self.server.app.dispatch_client.retry(int(task_id), run_id=self.server.app.dispatch_run(body))
+                with self.server.app.task_guard():
+                    result = self.server.app.dispatch_client.retry(int(task_id), run_id=self.server.app.dispatch_run(body))
+            elif path in ("/api/dispatch/wifi/connect", "/api/dispatch/wifi/probe", "/api/dispatch/wifi/attach"):
+                if urlsplit(self.path).query:
+                    raise ApiError(400, "连接参数不能放在网址中。")
+                result = self.server.app.wifi_operation(path.rsplit("/", 1)[1], body)
+                response_status = 202
             else:
                 raise ApiError(404, "未找到该接口。")
-            self._send(200, result)
+            self._send(response_status, result)
         except ApiError as exc:
+            self._send(exc.status, {"error": str(exc)})
+        except WiFiError as exc:
             self._send(exc.status, {"error": str(exc)})
         except DispatchError as exc:
             result = {"error": "中央服务未确认操作结果，请先刷新任务列表，勿重复提交。"}

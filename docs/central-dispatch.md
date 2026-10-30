@@ -24,6 +24,28 @@ Uno仍选Arduino Uno，ESP32-C3仍用Arduino core3.3.12和DIO/40MHz/8MB。新固
 
 ESP烧录后，通过原配置入口连接电脑可达的2.4GHz局域网：
 
+### 从网页连接 Wi-Fi（换电脑或尚未配网）
+
+现在不需要预先知道ESP32的IP，也不需要两块设备都已连接。先只启动中央与工作台：
+
+```powershell
+python -m tools.dispatch_start --output D:/Codex/esp32-linux-edge-scheduler/outputs/my-wifi-run --web-port 8765
+```
+
+打开 `http://127.0.0.1:8765/#dispatch`，在ESP32卡片点击“连接 Wi-Fi”。连接USB数据线，刷新串口，选择ESP32对应端口，输入2.4GHz Wi-Fi名称及密码。连接成功后读取板端返回的IP并自动重新连接TCP网关，不需要重启中央；已排队的任务随后由设备实际计算。如果设备已经连好Wi-Fi，也可以在同一面板填写现有局域网IPv4并接入。
+
+`--esp-host`和`--uno-port`现在可省略；`--esp-serial <端口>`只预选ESP的USB口。需要Uno时仍在启动参数指定它的实际串口。电脑与ESP应在能相互访问的同一局域网。此入口面向普通密码Wi-Fi／手机热点，不支持eduroam的账号认证或网页登录。
+
+页面分别显示Wi-Fi与中央接入状态：中央TCP已握手能证明无线链路可用；没有握手不能反推Wi-Fi断开。点击“读取板端状态”通过USB执行只读`STATUS`，明确区分板端未联网与已联网但中央未接入；诊断超过15秒且没有当前TCP证据时回到“状态未确认”，仍展示最近检测时间。旧固件不支持STATUS时会提示升级，原CONFIG配网仍兼容。
+
+更换Wi-Fi／IP前会检查ESP是否有在途任务；ESP离线时允许配置，即使中央已有排队任务，避免无设备时无法配网的死锁。连接操作期间暂不接受新的网页提交／重试，已派发任务不会迁移或重算。密码仅经本机受CSRF保护的POST传入内存，提交后清空输入框，不保存到源码、磁盘、日志或大模型上下文。
+
+启动器关闭时同时取消配网并停止自己创建的ESP网关。独立`tools.web_agent`仍可显示分析页面，但不拥有设备网关，配网入口会说明需要使用统一启动器；不会假装连接成功。
+
+配网接口独立于大模型工具：`GET /api/dispatch/wifi`只读内存诊断与当前中央状态，`GET /api/dispatch/wifi/ports`枚举本机串口；显式`POST /api/dispatch/wifi/probe`读取USB状态，`POST /api/dispatch/wifi/connect`接受`port,ssid,password`，`POST /api/dispatch/wifi/attach`接受`host`。POST沿用本机Host／Origin／CSRF验证，202表示操作已开始，前端继续轮询状态，不能把202当作已联网。仅允许枚举到且未配置给Uno的端口，以及局域网IPv4；不允许从URL携带密码或指定任意路径。
+
+### 命令行配置（保留）
+
 ```powershell
 python -m tools.wifi_configure --port <ESP串口> --ssid <热点名> --output D:/Codex/esp32-linux-edge-scheduler/outputs/my-wifi-config
 ```
@@ -84,6 +106,8 @@ python -m tools.dispatch_hardware_check --esp-host <实际IPv4> --uno-port <Uno�
 
 已归档结果可单独核对：`python -m tools.dispatch_verify --service <service目录>`。新旧模式的时间范围与负载不同，不直接据此宣称吞吐提升、硬实时或生产可靠性。
 
-本次最终实物验收接收93个任务：92成功、1个主动断线产生的unknown，另有1次queue_full拒绝。最大绝对误差约4.69e-6；同时在途上限为2，每设备为1，优先级审计无违规并记录3次紧急任务越过普通任务的选择。unknown任务28关联到成功重试29，原记录保留。归档后的状态文件显示服务已停止，不能据此显示设备当前在线。
+中央派发初版的实物验收接收93个任务：92成功、1个主动断线产生的unknown，另有1次queue_full拒绝。最大绝对误差约4.69e-6；同时在途上限为2，每设备为1，优先级审计无违规并记录3次紧急任务越过普通任务的选择。unknown任务28关联到成功重试29，原记录保留。归档后的状态文件显示服务已停止，不能据此显示设备当前在线。
+
+后续Wi-Fi入口改进通过普通与Sanitizer各196项回归、无设备浏览器流程与ESP32-C3编译，但未实物烧录／配网；范围与日志见[Wi-Fi入口验证](evidence/wifi-onboarding/README.md)。
 
 普通和ASan/UBSan构建均通过176项Python测试，共享固件3项CTest通过。网页另完成6项真实任务的表单提交与结果核对，以及离线禁用、筛选和窄屏检查；该6任务记录不用于证明紧急任务插队。原始记录、检查摘要、固件与源码SHA256以及截图见[第二版验收证据](evidence/central-dispatch/README.md)。

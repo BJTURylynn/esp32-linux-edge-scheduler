@@ -33,7 +33,9 @@ Uno 使用 AVR core 1.8.8；ESP 使用 ESP32 Arduino core 3.3.12，保持已实�
 
 Uno串口115200，D13约每1000ms切换；计算中也调用心跳更新。所有串口输出均为v2协议行。
 
-ESP32-C3 TCP9001接受一个网关连接，任务及结果仅经Wi-Fi。USB只保留配置诊断：`CONFIG`，随后SSID行、密码行；或`SCAN`。密码不回显、不写源码或持久配置。配置方式与原 `tools.wifi_configure` 兼容，Wi-Fi断开后等待重新配置。网络发送使用固定小缓冲和3秒绝对期限，避免调用可能清空接收缓存的 `NetworkClient.flush()`。
+ESP32-C3 TCP9001接受一个网关连接，任务及结果仅经Wi-Fi。USB保留配置诊断：`CONFIG`，随后SSID行、密码行；`SCAN`；以及只读`STATUS`。STATUS返回`WIFI_STATUS state=connected|disconnected ip=... port=9001 rssi_dbm=... protocol=2`，不包含SSID或密码。TCP已连接时仍可查询，最长计算中的查询会等当前计算返回后处理；此时CONFIG／SCAN会明确拒绝，须由工作台检查空闲并停止自有ESP网关后再更换网络。
+
+密码不回显、不写源码或持久配置。配置方式与原 `tools.wifi_configure` 兼容；新的网页连接入口自动使用板端IP重启ESP网关，旧固件仍可CONFIG，但要使用STATUS需重新烧录本版。Wi-Fi断开后等待重新配置。网络发送使用固定小缓冲和3秒绝对期限，避免调用可能清空接收缓存的 `NetworkClient.flush()`。
 
 ## 主机验证
 

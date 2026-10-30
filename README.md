@@ -4,7 +4,17 @@
 
 ## 第二版：中央派发、板上计算
 
-先烧录新的 `ComputeWorker` / `ComputeWiFi` 固件并配置 ESP32 的 2.4GHz Wi-Fi，在项目根目录运行：
+先烧录新的 `ComputeWorker` / `ComputeWiFi` 固件。ESP32 尚未联网时，可以先启动网页再从 ESP32 卡片的“连接 Wi-Fi”入口配网：
+
+```powershell
+python -m tools.dispatch_start --web-port 8765 --output D:/Codex/esp32-linux-edge-scheduler/outputs/my-wifi-run
+```
+
+页面区分 Wi-Fi 与中央接入状态，支持 USB 配网、只读板端状态查询和已有 IP 接入。成功配网后自动更新网关地址；尚无设备时任务会明确显示等待设备接入。Uno 可用 `--uno-port <实际COM口>` 接入。旧 ESP 固件可继续配网，新增 `STATUS` 查询需要更新本版固件。
+
+Wi-Fi 入口改进已通过普通及 Sanitizer 各196项回归、浏览器无设备流程与固件编译；本次未连接板卡，尚未完成新版配网的实物验收，详见[Wi-Fi 入口验证记录](docs/evidence/wifi-onboarding/README.md)。
+
+如果已知道 ESP32 实际地址，在项目根目录运行：
 
 ```powershell
 python -m tools.dispatch_start --esp-host <ESP32实际IPv4> --uno-port <实际COM口> --web-port 8765 --output D:/Codex/esp32-linux-edge-scheduler/outputs/my-dispatch-run
@@ -14,7 +24,7 @@ python -m tools.dispatch_start --esp-host <ESP32实际IPv4> --uno-port <实际CO
 
 每块板最多一个在途任务，中央容量 64，紧急优先且同级 FIFO；断线／超时保留“结果未知”，不会自动重发。任务是明确标注的合成样本，不是实测传感器数据。构建、协议、数值精度、故障与恢复见[中央派发说明](docs/central-dispatch.md)。
 
-本版已完成双板实物验收：93 个已接收任务中，92 个真实计算成功，1 个为主动断线测试保留的“结果未知”，另验证 1 次队列满拒绝。最大绝对误差约 `4.69e-6`，两设备同时在途上限为 2，审计记录 3 次紧急任务优先选择。普通及 ASan/UBSan 构建均通过 176 项 Python 测试；新旧固件分别编译。详见[实物记录、原始日志与网页截图](docs/evidence/central-dispatch/README.md)。
+中央派发初版已完成双板实物验收：93 个已接收任务中，92 个真实计算成功，1 个为主动断线测试保留的“结果未知”，另验证 1 次队列满拒绝。最大绝对误差约 `4.69e-6`，两设备同时在途上限为 2，审计记录 3 次紧急任务优先选择。当时普通及 ASan/UBSan 构建均通过 176 项 Python 测试；新旧固件分别编译。详见[实物记录、原始日志与网页截图](docs/evidence/central-dispatch/README.md)。
 
 ## 第一版：设备上传、Linux 计算
 
