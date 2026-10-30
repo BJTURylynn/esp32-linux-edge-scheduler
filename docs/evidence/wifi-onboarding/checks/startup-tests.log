@@ -1,0 +1,12 @@
+test_stop_and_eof_cleanup_real_owned_c_service_without_task_success_claim (test_dispatch_start.DispatchStartLifecycleTests.test_stop_and_eof_cleanup_real_owned_c_service_without_task_success_claim) ... skipped 'needs Linux C dispatcher'
+test_supervisor_sigterm_archives_and_releases_owned_listener (test_dispatch_start.DispatchStartLifecycleTests.test_supervisor_sigterm_archives_and_releases_owned_listener) ... skipped 'needs Linux C dispatcher'
+test_can_start_without_devices_and_configure_wifi_from_page_later (test_dispatch_start.DispatchStartTests.test_can_start_without_devices_and_configure_wifi_from_page_later) ... ok
+test_esp_usb_port_cannot_be_uno_port (test_dispatch_start.DispatchStartTests.test_esp_usb_port_cannot_be_uno_port) ... ok
+test_existing_output_is_never_overwritten (test_dispatch_start.DispatchStartTests.test_existing_output_is_never_overwritten) ... ok
+test_foreign_web_listener_is_not_stopped_and_no_children_started (test_dispatch_start.DispatchStartTests.test_foreign_web_listener_is_not_stopped_and_no_children_started) ... ok
+test_invalid_start_configuration_fails_before_touching_output (test_dispatch_start.DispatchStartTests.test_invalid_start_configuration_fails_before_touching_output) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.054s
+
+OK (skipped=2)

@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/dispatch.css">
   <script defer src="/app.js"></script>
+  <script defer src="/wifi.js"></script>
   <script defer src="/dispatch.js"></script>
 </head>
 <body>
@@ -69,6 +70,31 @@
           <div class="dispatch-banner"><div><span class="dispatch-status-dot" id="dispatch-dot"></span><strong id="dispatch-connection">尚未连接中央调度器</strong><span id="dispatch-poll-time"></span></div><p>在这里提交实际任务，交给两块板计算。以下状态来自中央服务，与示例和历史分析独立。</p></div>
           <div class="dispatch-error" id="dispatch-error" role="alert" hidden></div>
           <div class="dispatch-nodes" id="dispatch-nodes"></div>
+          <section class="dispatch-card wifi-panel" id="wifi-panel" aria-labelledby="wifi-title" hidden>
+            <div class="dispatch-card-heading"><div><h2 id="wifi-title">连接 ESP32 的 Wi-Fi</h2><p class="dispatch-caption">先让开发板联网，再由网关接入中央。换电脑或重新上电后，可以在这里重新连接。</p></div><button type="button" class="text-button" id="wifi-close" aria-label="收起 Wi-Fi 连接">收起</button></div>
+            <div class="wifi-summary" aria-live="polite"><span id="wifi-status-badge" class="wifi-badge unknown">Wi-Fi 状态未确认</span><span id="wifi-central-badge" class="wifi-badge unknown">中央连接未确认</span><span id="wifi-ip">IP —</span></div>
+            <p id="wifi-message" class="wifi-message" role="status">正在读取本机连接服务…</p>
+            <p id="wifi-observation" class="wifi-observation"></p>
+            <div id="wifi-unsupported" class="wifi-unsupported" hidden><strong>此启动方式尚未启用设备连接管理。</strong><p>停止当前工作台后，在项目目录使用统一入口启动。可以先不填写设备 IP，随后在此页面配网。</p><code>python -m tools.dispatch_start --output &lt;新的输出目录&gt;</code></div>
+            <div class="wifi-forms" id="wifi-forms">
+              <form id="wifi-connect-form" autocomplete="off">
+                <div class="wifi-method"><span>01</span><div><h3>通过 USB 配置 Wi-Fi</h3><p>把 ESP32 的 USB 数据线接到本机，选择它的串口。Uno 的串口不会用于配网。</p></div></div>
+                <fieldset id="wifi-config-fields" disabled><div class="wifi-form-grid">
+                  <label class="wifi-port-label">ESP32 USB 串口<div class="wifi-port-row"><select id="wifi-port" name="port" required aria-label="ESP32 USB 串口"><option value="">请刷新并选择串口</option></select><button type="button" class="secondary-button" id="wifi-ports-refresh">刷新串口</button></div></label>
+                  <label>Wi-Fi 名称（SSID）<input id="wifi-ssid" name="ssid" type="text" autocomplete="off" spellcheck="false" placeholder="输入 2.4GHz Wi-Fi 名称" required maxlength="32"></label>
+                  <label>Wi-Fi 密码<input id="wifi-password" name="password" type="password" autocomplete="off" spellcheck="false" placeholder="8～63 字节，不保存密码" required minlength="8" maxlength="63"></label>
+                </div><div class="wifi-actions"><button type="button" class="secondary-button" id="wifi-probe">读取板端 Wi-Fi 状态</button><button type="submit" class="primary-button" id="wifi-connect">连接 Wi-Fi 并接入中央</button></div></fieldset>
+                <p class="wifi-tip">使用普通密码的 2.4GHz Wi-Fi 或手机热点，电脑须能访问同一局域网；此入口不支持 eduroam 账号认证或网页登录。密码只用于本次配网，不写入源码、日志或浏览器存储。配网期间暂停网页任务提交。</p>
+              </form>
+              <form id="wifi-attach-form">
+                <div class="wifi-method"><span>02</span><div><h3>已联网？用现有 IP 接入</h3><p>如果开发板已经连好 Wi-Fi，填写它的实际局域网 IPv4。此入口只更新网关地址，不修改 Wi-Fi。</p></div></div>
+                <fieldset id="wifi-attach-fields" disabled><label>ESP32 IPv4 地址<input id="wifi-host" name="host" type="text" autocomplete="off" spellcheck="false" inputmode="decimal" placeholder="例如 192.168.1.25" required maxlength="15"></label><button type="submit" class="secondary-button" id="wifi-attach">接入这个地址</button></fieldset>
+              </form>
+            </div>
+            <p id="wifi-form-error" class="wifi-form-error" role="alert" hidden></p>
+            <p id="wifi-operation-lock" class="wifi-lock" hidden></p>
+          </section>
+          <div class="dispatch-waiting" id="dispatch-waiting" role="status" hidden></div>
           <div class="dispatch-stats">
             <div><span>中央队列</span><strong id="dispatch-queue">—</strong></div><div><span>派发／计算中</span><strong id="dispatch-active">—</strong></div><div><span>设备已完成</span><strong id="dispatch-completed">—</strong></div><div><span>异常／结果未知</span><strong id="dispatch-failures">—</strong></div>
           </div>

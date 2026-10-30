@@ -1,0 +1,19 @@
+test_live_state_is_separate_from_historical_sources (test_dispatch_web.DispatchWebTests.test_live_state_is_separate_from_historical_sources) ... ok
+test_model_tool_capabilities_remain_read_only (test_dispatch_web.DispatchWebTests.test_model_tool_capabilities_remain_read_only) ... ok
+test_retry_binds_id_to_displayed_run (test_dispatch_web.DispatchWebTests.test_retry_binds_id_to_displayed_run) ... ok
+test_submission_receipt_keeps_partial_rejections_explicit (test_dispatch_web.DispatchWebTests.test_submission_receipt_keeps_partial_rejections_explicit) ... ok
+test_submit_requires_csrf_and_epoch_and_rejects_endpoint_or_path (test_dispatch_web.DispatchWebTests.test_submit_requires_csrf_and_epoch_and_rejects_endpoint_or_path) ... ok
+test_unavailable_central_never_returns_historical_success (test_dispatch_web.DispatchWebTests.test_unavailable_central_never_returns_historical_success) ... ok
+test_uncertain_submission_has_receipts_and_is_not_repeated (test_dispatch_web.DispatchWebTests.test_uncertain_submission_has_receipts_and_is_not_repeated) ... ok
+test_connect_probe_attach_are_explicit_csrf_protected_and_nonblocking (test_dispatch_wifi_web.DispatchWiFiHTTPTests.test_connect_probe_attach_are_explicit_csrf_protected_and_nonblocking) ... ok
+test_current_central_handshake_is_wifi_transport_evidence (test_dispatch_wifi_web.DispatchWiFiHTTPTests.test_current_central_handshake_is_wifi_transport_evidence) ... ok
+test_no_task_submission_or_retry_during_reconfiguration (test_dispatch_wifi_web.DispatchWiFiHTTPTests.test_no_task_submission_or_retry_during_reconfiguration) ... ok
+test_offline_central_does_not_mean_wifi_disconnected (test_dispatch_wifi_web.DispatchWiFiHTTPTests.test_offline_central_does_not_mean_wifi_disconnected) ... ok
+test_port_enumeration_and_disabled_standalone_mode (test_dispatch_wifi_web.DispatchWiFiHTTPTests.test_port_enumeration_and_disabled_standalone_mode) ... ok
+test_usb_observation_is_independent_and_expires (test_dispatch_wifi_web.DispatchWiFiHTTPTests.test_usb_observation_is_independent_and_expires) ... ok
+test_wifi_changes_and_secrets_cannot_be_put_in_url (test_dispatch_wifi_web.DispatchWiFiHTTPTests.test_wifi_changes_and_secrets_cannot_be_put_in_url) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 7.436s
+
+OK

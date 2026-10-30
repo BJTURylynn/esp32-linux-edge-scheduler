@@ -1,0 +1,78 @@
+{
+  "success": true,
+  "error": null,
+  "stage": "stopped",
+  "central_port": 54828,
+  "web_url": "http://127.0.0.1:8765/#dispatch",
+  "hardware_validated": false,
+  "semantics": "startup/lifecycle only; inspect tasks and verify numerical results",
+  "last_live_state": {
+    "ok": true,
+    "v": 2,
+    "running": true,
+    "run_id": "111d3d64d1741328",
+    "policy": "priority",
+    "queue_depth": 2,
+    "queue_capacity": 64,
+    "record_capacity": 512,
+    "counts": {
+      "queued": 2,
+      "dispatching": 0,
+      "running": 0,
+      "succeeded": 0,
+      "failed": 0,
+      "unknown": 0,
+      "rejected": 0
+    },
+    "nodes": [
+      {
+        "device": "uno-01",
+        "state": "offline",
+        "task_id": null,
+        "last_error": null
+      },
+      {
+        "device": "esp32c3-01",
+        "state": "offline",
+        "task_id": null,
+        "last_error": null
+      }
+    ],
+    "tasks": [
+      {
+        "id": 1,
+        "priority": "normal",
+        "seed": 0,
+        "count": 256,
+        "window": 8,
+        "passes": 100,
+        "state": "queued",
+        "device": null,
+        "retry_of": null,
+        "mean": null,
+        "rms": null,
+        "compute_us": null,
+        "wait_ms": null,
+        "roundtrip_ms": null,
+        "error": null
+      },
+      {
+        "id": 2,
+        "priority": "normal",
+        "seed": 1,
+        "count": 256,
+        "window": 8,
+        "passes": 100,
+        "state": "queued",
+        "device": null,
+        "retry_of": null,
+        "mean": null,
+        "rms": null,
+        "compute_us": null,
+        "wait_ms": null,
+        "roundtrip_ms": null,
+        "error": null
+      }
+    ]
+  }
+}

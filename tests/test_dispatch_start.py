@@ -28,8 +28,19 @@ def args(output, **changes):
 
 
 class DispatchStartTests(unittest.TestCase):
+    def test_can_start_without_devices_and_configure_wifi_from_page_later(self):
+        with tempfile.TemporaryDirectory() as temp:
+            selected = args(Path(temp)/'run', esp_host=None, uno_port=None)
+            validate(selected)
+            self.assertFalse(selected.output.exists())
+
+    def test_esp_usb_port_cannot_be_uno_port(self):
+        with tempfile.TemporaryDirectory() as temp:
+            with self.assertRaises(ValueError):
+                validate(args(Path(temp)/'run', esp_serial='COM10'))
+
     def test_invalid_start_configuration_fails_before_touching_output(self):
-        for change in ({'web_port': 0}, {'esp_host': '::1'}, {'uno_port': ''},
+        for change in ({'web_port': 0}, {'esp_host': '::1'}, {'esp_host': '255.255.255.255'}, {'uno_port': ''},
                        {'distribution': '--invalid'}, {'policy': 'automatic'}):
             with self.subTest(change=change), tempfile.TemporaryDirectory() as temp:
                 selected = args(Path(temp)/'run', **change)

@@ -1,0 +1,16 @@
+test_attach_offline_node_can_drain_existing_queue_while_uno_is_busy (test_dispatch_wifi.WiFiManagerTests.test_attach_offline_node_can_drain_existing_queue_while_uno_is_busy) ... ok
+test_busy_guard_and_shutdown_cancel_pending_usb_without_resurrection (test_dispatch_wifi.WiFiManagerTests.test_busy_guard_and_shutdown_cancel_pending_usb_without_resurrection) ... ok
+test_central_failure_and_raw_serial_error_do_not_leak (test_dispatch_wifi.WiFiManagerTests.test_central_failure_and_raw_serial_error_do_not_leak) ... ok
+test_constructor_and_snapshot_are_side_effect_free_unknown (test_dispatch_wifi.WiFiManagerTests.test_constructor_and_snapshot_are_side_effect_free_unknown) ... ok
+test_disconnected_and_old_firmware_are_honest (test_dispatch_wifi.WiFiManagerTests.test_disconnected_and_old_firmware_are_honest) ... ok
+test_failed_config_never_restarts_stale_host (test_dispatch_wifi.WiFiManagerTests.test_failed_config_never_restarts_stale_host) ... ok
+test_failed_operation_stays_exclusive_until_usb_cleanup_finishes (test_dispatch_wifi.WiFiManagerTests.test_failed_operation_stays_exclusive_until_usb_cleanup_finishes) ... ok
+test_inflight_esp_or_idle_with_backlog_cannot_reconfigure (test_dispatch_wifi.WiFiManagerTests.test_inflight_esp_or_idle_with_backlog_cannot_reconfigure) ... ok
+test_invalid_fields_credential_lengths_ports_and_addresses_are_rejected (test_dispatch_wifi.WiFiManagerTests.test_invalid_fields_credential_lengths_ports_and_addresses_are_rejected) ... ok
+test_read_only_probe_distinguishes_wifi_and_does_not_switch_gateway (test_dispatch_wifi.WiFiManagerTests.test_read_only_probe_distinguishes_wifi_and_does_not_switch_gateway) ... ok
+test_successful_config_replaces_only_owned_relay_and_keeps_secrets_out (test_dispatch_wifi.WiFiManagerTests.test_successful_config_replaces_only_owned_relay_and_keeps_secrets_out) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 1.892s
+
+OK

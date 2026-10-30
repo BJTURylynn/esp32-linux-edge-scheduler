@@ -1,0 +1,41 @@
+{
+  "data_source": "synthetic; browser run has no connected hardware",
+  "validation": {
+    "linux_python_tests": 196,
+    "linux_sanitizer_python_tests": 196,
+    "portable_firmware_ctest": 3,
+    "manager_tests": 11,
+    "http_tests": 14,
+    "firmware_compiled": true,
+    "hardware_wifi_validated": false,
+    "esp32_flash_bytes": 966563,
+    "esp32_global_ram_bytes": 37068,
+    "browser_waiting_tasks": 2,
+    "browser_completed_tasks": 0,
+    "mobile_viewport": {
+      "requested_width": 390,
+      "requested_height": 844,
+      "client_width": 375,
+      "scroll_width": 375
+    }
+  },
+  "hash_semantics": "SHA256 of local file bytes; Git may normalize text line endings",
+  "source_sha256": {
+    "tools/dispatch_wifi.py": "620ae7044fa008dc7e10328277e181e9046310fcddf0f478fc115c0fc2432929",
+    "tools/web_agent.py": "1088aa47ee9c212c03c4e2ba7314f743af8fdcd730169bbf394491d5de87b898",
+    "tools/dispatch_start.py": "8342d282823d4086907ea0c1a632703394c7e955844cf4ce6eededfe89c765d4",
+    "web/wifi.js": "109e585688d1c0b850b3d208593b4d69979d10c0eeb08e079d843b799361683b",
+    "web/dispatch.js": "b4ed25c5df2b7e6d5e3256709f4b7b1bae62b58f2bea689d4e3711b51535a5cc",
+    "web/dispatch.css": "18b883f5b7c154cb2179ecb2e52b1cb1b93e824c6082c02bd691421cbac32789",
+    "web/index.html": "aa03c27f853dbc6809e5c712a05e77e51455bae71eded2c4461a0a678f77aff0",
+    "firmware/esp32c3-arduino/ComputeWiFi/ComputeWiFi.ino": "9ee07f621b2c7c899c28d155828a86eea3605f0c35b7d800cfa7f3bfe1673d88"
+  },
+  "firmware_sha256": {
+    "firmware/ComputeWiFi.ino.bin": "c351c12fba07354790e7cbe0651b0e43ce5f328dcab33a13fa8686a68a8d010e",
+    "firmware/ComputeWiFi.ino.bootloader.bin": "ebad95d65d4880d2428ed4a8c8509dc2cba09973e3087ffa79f2b3275000e6c3",
+    "firmware/ComputeWiFi.ino.elf": "1aa4c1ac5331a6e136410aec3301e3c76b9014977c7d70242a80606c737a0cc4",
+    "firmware/ComputeWiFi.ino.map": "c3fbc1337f4f8339db5775d49ad1afc65421f1a853a9dc5161d48e15469db73e",
+    "firmware/ComputeWiFi.ino.merged.bin": "04fae11c4905b677919e0f266175e1616226fa7a832d7e4aede80d95176f0911",
+    "firmware/ComputeWiFi.ino.partitions.bin": "148b959cbff1c38aa8e1d5c0ba9d612c54997b945e56a63f41223eef650653a1"
+  }
+}
